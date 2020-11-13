@@ -5,21 +5,24 @@ import com.github.lgooddatepicker.components.DatePicker;
 import javax.swing.*;
 import java.awt.*;
 
-public class NewReservationPanel extends JPanel {
+public class NewReservationPanel {
+    private JPanel panel;
+
     public NewReservationPanel() {
-        setLayout(new GridBagLayout());
+        panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
         gbc.insets = new Insets(15, 15, 15, 15);
 
         gbc.gridy = 0;
-        add(new JLabel("New reservation"), gbc);
+        panel.add(new JLabel("New reservation"), gbc);
 
         gbc.gridy++;
-        add(createDatePickerPanel(), gbc);
+        panel.add(createDatePickerPanel(), gbc);
 
         gbc.gridy++;
-        add(new NrwBlock(), gbc);
+        panel.add(new ValidReservationBlock(), gbc);
 
         JButton createReservationButton = new JButton("Create reservation");
         createReservationButton.addActionListener(e -> {
@@ -27,7 +30,7 @@ public class NewReservationPanel extends JPanel {
         });
 
         gbc.gridy++;
-        add(createReservationButton, gbc);
+        panel.add(createReservationButton, gbc);
     }
 
     private JPanel createDatePickerPanel() {
@@ -51,5 +54,9 @@ public class NewReservationPanel extends JPanel {
         checkPanel.add(datePicker, BorderLayout.SOUTH);
 
         return checkPanel;
+    }
+
+    public JPanel getPanel() {
+        return panel;
     }
 }

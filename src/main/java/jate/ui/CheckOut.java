@@ -11,7 +11,6 @@ public class CheckOut implements ActionListener, ChangeListener {
 
     private GridBagConstraints gbc = new GridBagConstraints();
     private JPanel panel = new JPanel();
-    private static JFrame frame = new JFrame();
     private JComboBox<String> roomTypes;
     private JLabel totalCost = new JLabel("0");
     private int sumPerNight;
@@ -23,9 +22,6 @@ public class CheckOut implements ActionListener, ChangeListener {
     }
 
     public CheckOut() {
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1000, 700);
         panel.setLayout(new GridBagLayout());
 
         addHeading();
@@ -36,8 +32,6 @@ public class CheckOut implements ActionListener, ChangeListener {
         addTitle("Payment Information");
         addFinalSum();
         addButton();
-        frame.add(panel);
-        frame.show();
 
     }
 
@@ -185,5 +179,9 @@ public class CheckOut implements ActionListener, ChangeListener {
     public void stateChanged(ChangeEvent e) {
         int cost = (Integer)nights.getValue()* sumPerNight;
         totalCost.setText(Integer.toString(cost));
+    }
+
+    public JPanel getPanel() {
+        return panel;
     }
 }

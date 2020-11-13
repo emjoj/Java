@@ -4,10 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
-public class NrwBlock extends Box {
+public class ValidReservationBlock extends Box {
     private final JPanel panel;
 
-    public NrwBlock() {
+    public ValidReservationBlock() {
         super(BoxLayout.Y_AXIS);
         panel = new JPanel();
         panel.setPreferredSize(new Dimension(300, 250));
