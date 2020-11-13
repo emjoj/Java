@@ -1,0 +1,93 @@
+package jate.ui;
+
+import static java.awt.GridBagConstraints.CENTER;
+import static java.awt.GridBagConstraints.HORIZONTAL;
+
+import com.github.lgooddatepicker.components.DatePicker;
+
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class CheckinPanel implements ActionListener {
+    private final JPanel panel;
+
+    public CheckinPanel() {
+        panel = createCheckinPanel();
+    }
+
+    private JPanel createCheckinPanel() {
+        JPanel panel = new JPanel();
+
+        GridBagLayout layoutManager = new GridBagLayout();
+        panel.setLayout(layoutManager);
+
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.ipady = 10;
+        constraints.insets = new Insets(4, 0, 4, 0);
+        constraints.fill = HORIZONTAL;
+        constraints.gridy = 1;
+
+        fillCheckinPanel(panel, constraints);
+
+        return panel;
+    }
+
+    private void fillCheckinPanel(JPanel panel, GridBagConstraints constraints) {
+        addDateLabel(panel, constraints, "Check - in date: ");
+        constraints.gridy++;
+        addDateLabel(panel, constraints, "Check - out date: ");
+        constraints.gridy++;
+        addNumeralLabel(panel, constraints, "Room number: ");
+        constraints.gridy++;
+        addNumeralLabel(panel, constraints, "Number of people: ");
+        constraints.gridy++;
+
+        constraints.fill = CENTER;
+        addFillInPersonalInfoButton(panel, constraints);
+    }
+
+    private void addDateLabel(JPanel panel, GridBagConstraints constraints, String name) {
+        JLabel checkin = new JLabel(name);
+        checkin.setFont(new Font("Arial", Font.PLAIN, 15));
+        panel.add(checkin, constraints);
+
+        DatePicker datePicker = new DatePicker();
+        datePicker.setFont(new Font("Arial", Font.PLAIN, 15));
+        panel.add(datePicker, constraints);
+    }
+
+    private void addNumeralLabel(JPanel panel, GridBagConstraints constraints, String name) {
+        JLabel checkout = new JLabel(name);
+        checkout.setFont(new Font("Arial", Font.PLAIN, 15));
+        panel.add(checkout, constraints);
+
+        JTextField textField = new JTextField(5);
+        textField.setFont(new Font("Arial", Font.PLAIN, 15));
+        textField.setEditable(true);
+        panel.add(textField, constraints);
+    }
+
+    private void addFillInPersonalInfoButton(JPanel panel, GridBagConstraints constraints) {
+        JButton button = new JButton("Fill in personal information");
+        button.setFont(new Font("Arial", Font.PLAIN, 15));
+        button.addActionListener(this);
+        panel.add(button, constraints);
+    }
+
+    public JPanel getPanel() {
+        return panel;
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        new CheckinForm(3);
+    }
+}
