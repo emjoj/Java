@@ -2,37 +2,30 @@ package jate.ui;
 
 import static java.awt.GridBagConstraints.HORIZONTAL;
 
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CheckinForm extends JFrame implements ItemListener {
+public class CheckinDialog implements ItemListener {
 
     private final JPanel forms;
+    private final JDialog dialog;
 
-    public CheckinForm(int numberOfPanels) {
+    public CheckinDialog(int numberOfPanels) {
         forms = new JPanel(new CardLayout());
 
         JPanel popupMenuPanel = new JPanel();
         createPopupMenu(numberOfPanels, popupMenuPanel);
 
-        JFrame frame = createFrame();
-        frame.add(popupMenuPanel, BorderLayout.PAGE_START);
-        frame.add(forms, BorderLayout.CENTER);
+        dialog = createDialog();
+        dialog.add(popupMenuPanel, BorderLayout.PAGE_START);
+        dialog.add(forms, BorderLayout.CENTER);
+        dialog.setVisible(true);
+
     }
 
     private void createPopupMenu(int numberOfPanels, JPanel popupMenuPanel) {
@@ -51,12 +44,12 @@ public class CheckinForm extends JFrame implements ItemListener {
         return comboBoxItems;
     }
 
-    private JFrame createFrame() {
-        var frame = new JFrame("Personal information form");
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setSize(1000, 500);
-        frame.setVisible(true);
-        return frame;
+    private JDialog createDialog() {
+        var dialog = new JDialog();
+        dialog.setTitle("Personal information form");
+        dialog.setSize(1000, 500);
+        dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+        return dialog;
     }
 
     private JPanel createSingleForm(int number) {
@@ -92,6 +85,11 @@ public class CheckinForm extends JFrame implements ItemListener {
         labelAndTextboxTemplate(form, constraints, "Telephone:");
         labelAndTextboxTemplate(form, constraints, "Email: ");
         constraints.gridy++;
+        JButton confirmButton = new JButton("Confirm");
+        confirmButton.addActionListener(e -> {
+            dialog.dispose();
+        });
+        form.add(confirmButton, constraints);
         return form;
     }
 
@@ -99,25 +97,21 @@ public class CheckinForm extends JFrame implements ItemListener {
         labelAndTextboxTemplate(panel, constraints, "Name:");
 
         JTextField lastName = new JTextField(10);
-        lastName.setFont(new Font("Arial", Font.PLAIN, 15));
         lastName.setEditable(true);
         panel.add(lastName, constraints);
     }
 
     private void labelAndTextboxTemplate(JPanel panel, GridBagConstraints constraints, String s) {
         JLabel date = new JLabel(s);
-        date.setFont(new Font("Arial", Font.PLAIN, 15));
         panel.add(date, constraints);
 
         JTextField dateTextBox = new JTextField(10);
-        dateTextBox.setFont(new Font("Arial", Font.PLAIN, 15));
         dateTextBox.setEditable(true);
         panel.add(dateTextBox, constraints);
     }
 
     private void labelTemplate(JPanel panel, GridBagConstraints constraints, String name) {
         JLabel label = new JLabel(name);
-        label.setFont(new Font("Arial", Font.BOLD, 15));
         panel.add(label, constraints);
     }
 

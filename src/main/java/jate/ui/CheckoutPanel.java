@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class CheckOut implements ActionListener, ChangeListener {
+public class CheckoutPanel implements ActionListener, ChangeListener {
 
     private GridBagConstraints gbc = new GridBagConstraints();
     private JPanel panel = new JPanel();
@@ -16,14 +16,9 @@ public class CheckOut implements ActionListener, ChangeListener {
     private int sumPerNight;
     private JSpinner nights;
 
-    public static void main(String[] args) {
-
-        CheckOut checkOut = new CheckOut();
-    }
-
-    public CheckOut() {
+    public CheckoutPanel() {
         panel.setLayout(new GridBagLayout());
-
+        panel.setName("Check-out");
         addHeading();
         addTitle("Guest Information");
         addGuestInformation();

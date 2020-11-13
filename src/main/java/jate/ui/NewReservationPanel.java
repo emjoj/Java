@@ -10,6 +10,7 @@ public class NewReservationPanel {
 
     public NewReservationPanel() {
         panel = new JPanel();
+        panel.setName("New reservation");
         panel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -22,7 +23,7 @@ public class NewReservationPanel {
         panel.add(createDatePickerPanel(), gbc);
 
         gbc.gridy++;
-        panel.add(new ValidReservationBlock(), gbc);
+        panel.add(new ValidReservationBlock().getPanel(), gbc);
 
         JButton createReservationButton = new JButton("Create reservation");
         createReservationButton.addActionListener(e -> {

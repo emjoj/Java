@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 
 public class PersonalDataDialog extends JDialog {
+    private final JDialog dialog;
     private String name;
     private String surname;
     private String phoneNumber;
@@ -15,10 +16,11 @@ public class PersonalDataDialog extends JDialog {
     private final JTextField emailTextField = new JTextField(15);
 
     public PersonalDataDialog() {
-        setModal(true);
-        setTitle("Personal data");
-        setSize(400, 400);
-        setLocationRelativeTo(null);
+        dialog = new JDialog();
+        dialog.setModal(true);
+        dialog.setTitle("Personal data");
+        dialog.setSize(400, 400);
+        dialog.setLocationRelativeTo(null);
 
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -60,8 +62,8 @@ public class PersonalDataDialog extends JDialog {
         confirmButton.addActionListener(handleTextChange());
         panel.add(confirmButton, gbc);
 
-        add(panel);
-        setVisible(true);
+        dialog.add(panel);
+        dialog.setVisible(true);
     }
 
     private ActionListener handleTextChange() {
@@ -70,7 +72,7 @@ public class PersonalDataDialog extends JDialog {
             surname = surnameTextField.getText();
             phoneNumber = phoneNumberTextField.getText();
             email = emailTextField.getText();
-            setVisible(false);
+            dialog.dispose();
         };
     }
 

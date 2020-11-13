@@ -10,7 +10,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -22,6 +21,7 @@ public class CheckinPanel implements ActionListener {
 
     public CheckinPanel() {
         panel = createCheckinPanel();
+        panel.setName("Check-in");
     }
 
     private JPanel createCheckinPanel() {
@@ -57,28 +57,23 @@ public class CheckinPanel implements ActionListener {
 
     private void addDateLabel(JPanel panel, GridBagConstraints constraints, String name) {
         JLabel checkin = new JLabel(name);
-        checkin.setFont(new Font("Arial", Font.PLAIN, 15));
         panel.add(checkin, constraints);
 
         DatePicker datePicker = new DatePicker();
-        datePicker.setFont(new Font("Arial", Font.PLAIN, 15));
         panel.add(datePicker, constraints);
     }
 
     private void addNumeralLabel(JPanel panel, GridBagConstraints constraints, String name) {
         JLabel checkout = new JLabel(name);
-        checkout.setFont(new Font("Arial", Font.PLAIN, 15));
         panel.add(checkout, constraints);
 
         JTextField textField = new JTextField(5);
-        textField.setFont(new Font("Arial", Font.PLAIN, 15));
         textField.setEditable(true);
         panel.add(textField, constraints);
     }
 
     private void addFillInPersonalInfoButton(JPanel panel, GridBagConstraints constraints) {
         JButton button = new JButton("Fill in personal information");
-        button.setFont(new Font("Arial", Font.PLAIN, 15));
         button.addActionListener(this);
         panel.add(button, constraints);
     }
@@ -88,6 +83,6 @@ public class CheckinPanel implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-        new CheckinForm(3);
+        new CheckinDialog(3);
     }
 }

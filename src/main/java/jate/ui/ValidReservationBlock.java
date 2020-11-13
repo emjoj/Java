@@ -2,13 +2,17 @@ package jate.ui;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class ValidReservationBlock extends Box {
+public class ValidReservationBlock {
+    public JPanel getPanel() {
+        return panel;
+    }
+
     private final JPanel panel;
 
     public ValidReservationBlock() {
-        super(BoxLayout.Y_AXIS);
         panel = new JPanel();
         panel.setPreferredSize(new Dimension(300, 250));
 
@@ -19,7 +23,6 @@ public class ValidReservationBlock extends Box {
         addRoomTypeButton.addActionListener(handleRoomTypeAddition(addRoomTypeButton));
 
         panel.add(addRoomTypeButton);
-        add(panel);
     }
 
     private ActionListener handleRoomTypeAddition(JButton addRoomTypeButton) {
@@ -29,7 +32,7 @@ public class ValidReservationBlock extends Box {
             JPanel currentPanel = new JPanel();
 
             JComboBox<String> roomTypeComboBox = new JComboBox<>(new String[]{"1-bed room type", "2-bed room type"});
-            roomTypeComboBox.setPreferredSize(new Dimension(200, 30));
+            roomTypeComboBox.setPreferredSize(new Dimension(150, 30));
             currentPanel.add(roomTypeComboBox);
 
             JSpinner roomCountSpinner = new JSpinner(new SpinnerNumberModel(0, 0, null, 1));
@@ -37,14 +40,20 @@ public class ValidReservationBlock extends Box {
             currentPanel.add(roomCountSpinner);
 
             JButton removeButton = new JButton("X");
-            removeButton.addActionListener(e1 -> {
-
-            });
+            removeButton.addActionListener(removeRoomType(currentPanel));
             currentPanel.add(removeButton);
 
             panel.add(currentPanel);
             panel.add(addRoomTypeButton);
             panel.revalidate();
+        };
+    }
+
+    private ActionListener removeRoomType(JPanel currentPanel) {
+        return e -> {
+            panel.remove(currentPanel);
+            panel.revalidate();
+            panel.repaint();
         };
     }
 }
