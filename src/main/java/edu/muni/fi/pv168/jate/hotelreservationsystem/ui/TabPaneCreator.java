@@ -2,10 +2,11 @@ package edu.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
 import javax.swing.JTabbedPane;
 
-public class TabPaneCreator {
-    private JTabbedPane tabbedPane;
+final class TabPaneCreator {
 
-    public TabPaneCreator() {
+    private final JTabbedPane tabbedPane;
+
+    TabPaneCreator() {
         tabbedPane = new JTabbedPane();
         createTabs();
     }

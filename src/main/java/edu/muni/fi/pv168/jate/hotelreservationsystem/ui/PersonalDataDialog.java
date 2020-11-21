@@ -10,7 +10,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 
-public class PersonalDataDialog extends JDialog {
+final class PersonalDataDialog extends JDialog {
+
     private final JDialog dialog;
     private String name;
     private String surname;
@@ -21,7 +22,7 @@ public class PersonalDataDialog extends JDialog {
     private final JTextField phoneNumberTextField = new JTextField(15);
     private final JTextField emailTextField = new JTextField(15);
 
-    public PersonalDataDialog() {
+    PersonalDataDialog() {
         dialog = new JDialog();
         dialog.setModal(true);
         dialog.setTitle("Personal data");

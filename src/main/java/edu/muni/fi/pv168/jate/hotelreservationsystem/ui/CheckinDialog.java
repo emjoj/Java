@@ -19,12 +19,12 @@ import java.util.List;
 
 import static java.awt.GridBagConstraints.HORIZONTAL;
 
-public class CheckinDialog implements ItemListener {
+final class CheckinDialog implements ItemListener {
 
     private final JPanel forms;
     private final JDialog dialog;
 
-    public CheckinDialog(int numberOfPanels) {
+    CheckinDialog(int numberOfPanels) {
         forms = new JPanel(new CardLayout());
 
         JPanel popupMenuPanel = new JPanel();
@@ -34,7 +34,6 @@ public class CheckinDialog implements ItemListener {
         dialog.add(popupMenuPanel, BorderLayout.PAGE_START);
         dialog.add(forms, BorderLayout.CENTER);
         dialog.setVisible(true);
-
     }
 
     private void createPopupMenu(int numberOfPanels, JPanel popupMenuPanel) {

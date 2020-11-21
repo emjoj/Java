@@ -3,7 +3,8 @@ package edu.muni.fi.pv168.jate.hotelreservationsystem.ui;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
-public class Dashboard {
+public final class Dashboard {
+
     private final JFrame frame;
 
     public Dashboard() {

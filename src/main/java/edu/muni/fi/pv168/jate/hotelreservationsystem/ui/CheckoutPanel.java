@@ -17,16 +17,16 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class CheckoutPanel implements ActionListener, ChangeListener {
+final class CheckoutPanel implements ActionListener, ChangeListener {
 
-    private GridBagConstraints gbc = new GridBagConstraints();
-    private JPanel panel = new JPanel();
+    private final GridBagConstraints gbc = new GridBagConstraints();
+    private final JPanel panel = new JPanel();
     private JComboBox<String> roomTypes;
-    private JLabel totalCost = new JLabel("0");
+    private final JLabel totalCost = new JLabel("0");
     private int sumPerNight;
     private JSpinner nights;
 
-    public CheckoutPanel() {
+    CheckoutPanel() {
         panel.setLayout(new GridBagLayout());
         panel.setName("Check-out");
         addHeading();
@@ -37,14 +37,16 @@ public class CheckoutPanel implements ActionListener, ChangeListener {
         addTitle("Payment Information");
         addFinalSum();
         addButton();
+    }
 
+    public JPanel getPanel() {
+        return panel;
     }
 
     private void addHeading() {
         gbc.gridx = 1;
         gbc.insets = new Insets(15, 15, 15, 15);
         addLabel("Check-out Form");
-
     }
 
     private void addTitle(String title) {
@@ -60,8 +62,7 @@ public class CheckoutPanel implements ActionListener, ChangeListener {
         gbc.anchor = GridBagConstraints.FIRST_LINE_START;
     }
 
-    public void addGuestInformation() {
-
+    private void addGuestInformation() {
         addLabel("First Name:");
         addLabel("Last Name:");
         addLabel("Contact");
@@ -69,7 +70,6 @@ public class CheckoutPanel implements ActionListener, ChangeListener {
         gbc.gridx = 1;
         gbc.gridy = 2;
         gbc.ipady = 1;
-
 
         JTextField firstNameText = new JTextField(15);
         panel.add(firstNameText, gbc);
@@ -81,11 +81,9 @@ public class CheckoutPanel implements ActionListener, ChangeListener {
         gbc.gridy++;
         JTextField contact = new JTextField(15);
         panel.add(contact, gbc);
-
     }
 
-    public void addRoomInformation() {
-
+    private void addRoomInformation() {
         addLabel("Room number:");
         addLabel("Room type:");
         addLabel("Nights:");
@@ -99,11 +97,9 @@ public class CheckoutPanel implements ActionListener, ChangeListener {
 
         addRoomType();
         addNights();
-
     }
 
-    public void addFinalSum() {
-
+    private void addFinalSum() {
         addLabel("Total Cost:");
         addLabel("Payment method:");
 
@@ -114,15 +110,13 @@ public class CheckoutPanel implements ActionListener, ChangeListener {
         addPaymentMethod();
     }
 
-    public void addButton() {
-
+    private void addButton() {
         gbc.gridx--;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.CENTER;
         JButton checkOut = new JButton("Check-out");
         checkOut.addActionListener(this);
         panel.add(checkOut, gbc);
-
     }
 
     private void addRoomType() {
@@ -134,7 +128,6 @@ public class CheckoutPanel implements ActionListener, ChangeListener {
     }
 
     private void addNights() {
-
         gbc.gridy++;
         nights = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
         nights.addChangeListener(this);
@@ -160,7 +153,6 @@ public class CheckoutPanel implements ActionListener, ChangeListener {
         panel.add(cardMethod, gbc);
     }
 
-
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == roomTypes) {
@@ -181,16 +173,11 @@ public class CheckoutPanel implements ActionListener, ChangeListener {
             }
             totalCost.setText(Integer.toString((Integer) nights.getValue() * sumPerNight));
         }
-
     }
 
     @Override
     public void stateChanged(ChangeEvent e) {
         int cost = (Integer) nights.getValue() * sumPerNight;
         totalCost.setText(Integer.toString(cost));
-    }
-
-    public JPanel getPanel() {
-        return panel;
     }
 }

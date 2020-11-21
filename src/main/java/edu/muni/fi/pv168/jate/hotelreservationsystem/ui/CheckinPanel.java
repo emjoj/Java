@@ -15,12 +15,17 @@ import java.awt.event.ActionListener;
 import static java.awt.GridBagConstraints.CENTER;
 import static java.awt.GridBagConstraints.HORIZONTAL;
 
-public class CheckinPanel implements ActionListener {
+final class CheckinPanel implements ActionListener {
+
     private final JPanel panel;
 
-    public CheckinPanel() {
+    CheckinPanel() {
         panel = createCheckinPanel();
         panel.setName("Check-in");
+    }
+
+    public JPanel getPanel() {
+        return panel;
     }
 
     private JPanel createCheckinPanel() {
@@ -75,10 +80,6 @@ public class CheckinPanel implements ActionListener {
         JButton button = new JButton("Fill in personal information");
         button.addActionListener(this);
         panel.add(button, constraints);
-    }
-
-    public JPanel getPanel() {
-        return panel;
     }
 
     public void actionPerformed(ActionEvent e) {

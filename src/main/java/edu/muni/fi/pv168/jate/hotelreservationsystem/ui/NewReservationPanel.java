@@ -11,8 +11,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Label;
 
-public class NewReservationPanel {
-    private JPanel panel;
+final class NewReservationPanel {
+
+    private final JPanel panel;
 
     public NewReservationPanel() {
         panel = new JPanel();
@@ -40,6 +41,10 @@ public class NewReservationPanel {
         panel.add(createReservationButton, gbc);
     }
 
+    public JPanel getPanel() {
+        return panel;
+    }
+
     private JPanel createDatePickerPanel() {
         JPanel datePickerPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -61,9 +66,5 @@ public class NewReservationPanel {
         checkPanel.add(datePicker, BorderLayout.SOUTH);
 
         return checkPanel;
-    }
-
-    public JPanel getPanel() {
-        return panel;
     }
 }
