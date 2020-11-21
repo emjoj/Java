@@ -18,8 +18,8 @@ public final class Dashboard {
     private JFrame createFrame() {
         var frame = new JFrame("Hotel Reservation System");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setSize(1000, 700);
-        frame.add((new TabPaneCreator()).getTabbedPane());
+        frame.add(new TabPaneCreator().getTabbedPane());
+        frame.pack();
         return frame;
     }
 

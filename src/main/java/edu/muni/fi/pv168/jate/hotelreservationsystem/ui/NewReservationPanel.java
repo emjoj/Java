@@ -27,15 +27,13 @@ final class NewReservationPanel {
         panel.add(new JLabel("New reservation"), gbc);
 
         gbc.gridy++;
-        panel.add(createDatePickerPanel(), gbc);
+        panel.add(createDatePickers(), gbc);
 
         gbc.gridy++;
         panel.add(new ValidReservationBlock().getPanel(), gbc);
 
         JButton createReservationButton = new JButton("Create reservation");
-        createReservationButton.addActionListener(e -> {
-            PersonalDataDialog personalDataDialog = new PersonalDataDialog(); // TODO
-        });
+        createReservationButton.addActionListener(e -> new PersonalDataDialog());
 
         gbc.gridy++;
         panel.add(createReservationButton, gbc);
@@ -45,26 +43,26 @@ final class NewReservationPanel {
         return panel;
     }
 
-    private JPanel createDatePickerPanel() {
+    private JPanel createDatePickers() {
         JPanel datePickerPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(0, 15, 0, 15);
 
-        datePickerPanel.add(createCheckPanel("in"), gbc);
-        datePickerPanel.add(createCheckPanel("out"), gbc);
+        datePickerPanel.add(createDatePickerField("Check-in date"), gbc);
+        datePickerPanel.add(createDatePickerField("Check-out date"), gbc);
 
         return datePickerPanel;
     }
 
-    private JPanel createCheckPanel(String inOrOut) {
-        JPanel checkPanel = new JPanel();
-        checkPanel.setLayout(new BorderLayout());
+    private JPanel createDatePickerField(String label) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
 
-        checkPanel.add(new Label(String.format("Check-%s date:", inOrOut)), BorderLayout.NORTH);
+        panel.add(new Label(label + ":"), BorderLayout.NORTH);
 
         DatePicker datePicker = new DatePicker();
-        checkPanel.add(datePicker, BorderLayout.SOUTH);
+        panel.add(datePicker, BorderLayout.SOUTH);
 
-        return checkPanel;
+        return panel;
     }
 }
