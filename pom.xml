@@ -4,9 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>groupId</groupId>
-    <artifactId>pv168-java-seminar</artifactId>
+    <groupId>edu.muni.fi.pv168</groupId>
+    <artifactId>hotel-reservation-system</artifactId>
     <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+    </properties>
 
     <dependencies>
         <dependency>
