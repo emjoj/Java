@@ -12,14 +12,12 @@ import java.awt.Dialog;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.awt.GridBagConstraints.HORIZONTAL;
 
-final class CheckinDialog implements ItemListener {
+final class CheckinDialog {
 
     private final JPanel forms;
     private final JDialog dialog;
@@ -37,9 +35,12 @@ final class CheckinDialog implements ItemListener {
     }
 
     private void createPopupMenu(int numberOfPanels, JPanel popupMenuPanel) {
-        JComboBox popupMenu = new JComboBox(createForms(numberOfPanels).toArray());
+        JComboBox<String> popupMenu = new JComboBox<>((String[]) createForms(numberOfPanels).toArray());
         popupMenu.setEditable(false);
-        popupMenu.addItemListener(this);
+        popupMenu.addItemListener(e -> {
+            CardLayout cardLayout = (CardLayout) (forms.getLayout());
+            cardLayout.show(forms, (String) e.getItem());
+        });
         popupMenuPanel.add(popupMenu);
     }
 
@@ -94,9 +95,7 @@ final class CheckinDialog implements ItemListener {
         labelAndTextboxTemplate(form, constraints, "Email: ");
         constraints.gridy++;
         JButton confirmButton = new JButton("Confirm");
-        confirmButton.addActionListener(e -> {
-            dialog.dispose();
-        });
+        confirmButton.addActionListener(e -> dialog.dispose());
         form.add(confirmButton, constraints);
         return form;
     }
@@ -121,11 +120,5 @@ final class CheckinDialog implements ItemListener {
     private void labelTemplate(JPanel panel, GridBagConstraints constraints, String name) {
         JLabel label = new JLabel(name);
         panel.add(label, constraints);
-    }
-
-    @Override
-    public void itemStateChanged(ItemEvent e) {
-        CardLayout cardLayout = (CardLayout) (forms.getLayout());
-        cardLayout.show(forms, (String) e.getItem());
     }
 }

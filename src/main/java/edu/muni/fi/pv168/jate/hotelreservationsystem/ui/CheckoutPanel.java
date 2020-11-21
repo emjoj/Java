@@ -9,15 +9,14 @@ import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Objects;
 
-final class CheckoutPanel implements ActionListener, ChangeListener {
+final class CheckoutPanel {
 
     private final GridBagConstraints gbc = new GridBagConstraints();
     private final JPanel panel = new JPanel();
@@ -115,22 +114,24 @@ final class CheckoutPanel implements ActionListener, ChangeListener {
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.CENTER;
         JButton checkOut = new JButton("Check-out");
-        checkOut.addActionListener(this);
+        checkOut.addActionListener(e -> {
+            // TODO
+        });
         panel.add(checkOut, gbc);
     }
 
     private void addRoomType() {
         gbc.gridy++;
-        String[] roomTypeStrings = {"Select", "1-bed room", "2-bed room", "3-bed room"};
+        String[] roomTypeStrings = {"1-bed room", "2-bed room", "3-bed room"};
         roomTypes = new JComboBox<>(roomTypeStrings);
-        roomTypes.addActionListener(this);
+        roomTypes.addActionListener(handleRoomTypeChange());
         panel.add(roomTypes, gbc);
     }
 
     private void addNights() {
         gbc.gridy++;
         nights = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
-        nights.addChangeListener(this);
+        nights.addChangeListener(handleNightCountChange());
         panel.add(nights, gbc);
     }
 
@@ -153,12 +154,10 @@ final class CheckoutPanel implements ActionListener, ChangeListener {
         panel.add(cardMethod, gbc);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == roomTypes) {
-            JComboBox<String> copyRoomTypes = (JComboBox) e.getSource();
-            String types = (String) copyRoomTypes.getSelectedItem();
-            switch (types) {
+    public ActionListener handleRoomTypeChange() {
+        return e -> {
+            String type = (String) roomTypes.getSelectedItem();
+            switch (Objects.requireNonNull(type)) {
                 case "1-bed room":
                     sumPerNight = 50;
                     break;
@@ -168,16 +167,15 @@ final class CheckoutPanel implements ActionListener, ChangeListener {
                 case "3-bed room":
                     sumPerNight = 150;
                     break;
-                default:
-                    sumPerNight = 0;
             }
             totalCost.setText(Integer.toString((Integer) nights.getValue() * sumPerNight));
-        }
+        };
     }
 
-    @Override
-    public void stateChanged(ChangeEvent e) {
-        int cost = (Integer) nights.getValue() * sumPerNight;
-        totalCost.setText(Integer.toString(cost));
+    public ChangeListener handleNightCountChange() {
+        return e -> {
+            int cost = (Integer) nights.getValue() * sumPerNight;
+            totalCost.setText(Integer.toString(cost));
+        };
     }
 }

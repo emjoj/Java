@@ -10,7 +10,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 
-final class PersonalDataDialog extends JDialog {
+final class PersonalDataDialog {
 
     private final JDialog dialog;
     private String name;
@@ -83,7 +83,6 @@ final class PersonalDataDialog extends JDialog {
         };
     }
 
-    @Override
     public String getName() {
         return name;
     }
