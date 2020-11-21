@@ -10,7 +10,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 
-final class PersonalDataDialog {
+final class NewReservationDialog {
 
     private final JDialog dialog;
     private String name;
@@ -22,7 +22,7 @@ final class PersonalDataDialog {
     private final JTextField phoneNumberTextField = new JTextField(15);
     private final JTextField emailTextField = new JTextField(15);
 
-    PersonalDataDialog() {
+    NewReservationDialog() {
         dialog = new JDialog();
         dialog.setModal(true);
         dialog.setTitle("Personal data");

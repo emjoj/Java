@@ -33,7 +33,7 @@ final class NewReservationPanel {
         panel.add(new ValidReservationBlock().getPanel(), gbc);
 
         JButton createReservationButton = new JButton("Create reservation");
-        createReservationButton.addActionListener(e -> new PersonalDataDialog());
+        createReservationButton.addActionListener(e -> new NewReservationDialog());
 
         gbc.gridy++;
         panel.add(createReservationButton, gbc);
