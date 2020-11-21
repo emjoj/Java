@@ -1,7 +1,4 @@
-package jate.ui;
-
-import static java.awt.GridBagConstraints.CENTER;
-import static java.awt.GridBagConstraints.HORIZONTAL;
+package edu.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
 import com.github.lgooddatepicker.components.DatePicker;
 
@@ -9,12 +6,14 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import static java.awt.GridBagConstraints.CENTER;
+import static java.awt.GridBagConstraints.HORIZONTAL;
 
 public class CheckinPanel implements ActionListener {
     private final JPanel panel;

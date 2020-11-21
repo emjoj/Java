@@ -1,14 +1,23 @@
-package jate.ui;
+package edu.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
-import static java.awt.GridBagConstraints.HORIZONTAL;
-
-import javax.swing.*;
-
-import java.awt.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Dialog;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.awt.GridBagConstraints.HORIZONTAL;
 
 public class CheckinDialog implements ItemListener {
 

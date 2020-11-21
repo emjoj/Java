@@ -1,9 +1,15 @@
-package jate.ui;
+package edu.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
 import com.github.lgooddatepicker.components.DatePicker;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Label;
 
 public class NewReservationPanel {
     private JPanel panel;

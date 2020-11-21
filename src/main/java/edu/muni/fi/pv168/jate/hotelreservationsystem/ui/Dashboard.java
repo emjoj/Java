@@ -1,4 +1,4 @@
-package jate.ui;
+package edu.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;

@@ -1,7 +1,13 @@
-package jate.ui;
+package edu.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionListener;
 
 public class PersonalDataDialog extends JDialog {

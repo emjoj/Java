@@ -1,6 +1,6 @@
-package jate.ui;
+package edu.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
-import javax.swing.*;
+import javax.swing.JTabbedPane;
 
 public class TabPaneCreator {
     private JTabbedPane tabbedPane;
