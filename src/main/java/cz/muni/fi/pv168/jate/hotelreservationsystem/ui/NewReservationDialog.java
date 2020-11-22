@@ -5,9 +5,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionListener;
 
 final class NewReservationDialog {
@@ -22,8 +20,8 @@ final class NewReservationDialog {
     private final JTextField phoneNumberTextField = new JTextField(15);
     private final JTextField emailTextField = new JTextField(15);
 
-    NewReservationDialog() {
-        dialog = new JDialog();
+    NewReservationDialog(Window owner) {
+        dialog = new JDialog(owner);
         dialog.setModal(true);
         dialog.setTitle("Personal data");
         dialog.setSize(400, 400);

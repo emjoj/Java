@@ -6,12 +6,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Dialog;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,20 +17,21 @@ final class CheckinDialog {
     private final JPanel forms;
     private final JDialog dialog;
 
-    CheckinDialog(int numberOfPanels) {
+    CheckinDialog(Window owner, int numberOfPanels) {
         forms = new JPanel(new CardLayout());
 
         JPanel popupMenuPanel = new JPanel();
         createPopupMenu(numberOfPanels, popupMenuPanel);
 
-        dialog = createDialog();
+        dialog = createDialog(owner);
         dialog.add(popupMenuPanel, BorderLayout.PAGE_START);
         dialog.add(forms, BorderLayout.CENTER);
+        dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }
 
     private void createPopupMenu(int numberOfPanels, JPanel popupMenuPanel) {
-        JComboBox<String> popupMenu = new JComboBox<>((String[]) createForms(numberOfPanels).toArray());
+        JComboBox popupMenu = new JComboBox(createForms(numberOfPanels).toArray());
         popupMenu.setEditable(false);
         popupMenu.addItemListener(e -> {
             CardLayout cardLayout = (CardLayout) (forms.getLayout());
@@ -53,8 +49,8 @@ final class CheckinDialog {
         return comboBoxItems;
     }
 
-    private JDialog createDialog() {
-        var dialog = new JDialog();
+    private JDialog createDialog(Window owner) {
+        var dialog = new JDialog(owner);
         dialog.setTitle("Personal information form");
         dialog.setSize(1000, 500);
         dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);

@@ -9,6 +9,7 @@ import javax.swing.JTextField;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 
 import static java.awt.GridBagConstraints.CENTER;
 import static java.awt.GridBagConstraints.HORIZONTAL;
@@ -16,8 +17,10 @@ import static java.awt.GridBagConstraints.HORIZONTAL;
 final class CheckinPanel {
 
     private final JPanel panel;
+    private final Window owner;
 
-    CheckinPanel() {
+    CheckinPanel(Window owner) {
+        this.owner = owner;
         panel = createCheckinPanel();
     }
 
@@ -76,7 +79,7 @@ final class CheckinPanel {
 
     private void addFillInPersonalInfoButton(JPanel panel, GridBagConstraints constraints) {
         JButton button = new JButton("Fill in personal information");
-        button.addActionListener(e -> new CheckinDialog(3));
+        button.addActionListener(e -> new CheckinDialog(owner, 3));
         panel.add(button, constraints);
     }
 }
