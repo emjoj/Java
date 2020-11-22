@@ -1,4 +1,4 @@
-package edu.muni.fi.pv168.jate.hotelreservationsystem.ui;
+package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
 import javax.swing.JTabbedPane;
 

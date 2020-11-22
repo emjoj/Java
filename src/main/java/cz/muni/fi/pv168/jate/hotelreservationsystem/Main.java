@@ -1,6 +1,6 @@
-package edu.muni.fi.pv168.jate.hotelreservationsystem;
+package cz.muni.fi.pv168.jate.hotelreservationsystem;
 
-import edu.muni.fi.pv168.jate.hotelreservationsystem.ui.Dashboard;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.ui.Dashboard;
 
 import java.awt.EventQueue;
 
