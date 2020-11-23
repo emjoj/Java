@@ -1,37 +1,42 @@
-package jate.ui;
+package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
-import static java.awt.GridBagConstraints.HORIZONTAL;
-
-import javax.swing.*;
-
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CheckinDialog implements ItemListener {
+import static java.awt.GridBagConstraints.HORIZONTAL;
+
+final class CheckinDialog {
 
     private final JPanel forms;
     private final JDialog dialog;
 
-    public CheckinDialog(int numberOfPanels) {
+    CheckinDialog(Window owner, int numberOfPanels) {
         forms = new JPanel(new CardLayout());
 
         JPanel popupMenuPanel = new JPanel();
         createPopupMenu(numberOfPanels, popupMenuPanel);
 
-        dialog = createDialog();
+        dialog = createDialog(owner);
         dialog.add(popupMenuPanel, BorderLayout.PAGE_START);
         dialog.add(forms, BorderLayout.CENTER);
+        dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-
     }
 
     private void createPopupMenu(int numberOfPanels, JPanel popupMenuPanel) {
         JComboBox popupMenu = new JComboBox(createForms(numberOfPanels).toArray());
         popupMenu.setEditable(false);
-        popupMenu.addItemListener(this);
+        popupMenu.addItemListener(e -> {
+            CardLayout cardLayout = (CardLayout) (forms.getLayout());
+            cardLayout.show(forms, (String) e.getItem());
+        });
         popupMenuPanel.add(popupMenu);
     }
 
@@ -44,8 +49,8 @@ public class CheckinDialog implements ItemListener {
         return comboBoxItems;
     }
 
-    private JDialog createDialog() {
-        var dialog = new JDialog();
+    private JDialog createDialog(Window owner) {
+        var dialog = new JDialog(owner);
         dialog.setTitle("Personal information form");
         dialog.setSize(1000, 500);
         dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
@@ -86,9 +91,7 @@ public class CheckinDialog implements ItemListener {
         labelAndTextboxTemplate(form, constraints, "Email: ");
         constraints.gridy++;
         JButton confirmButton = new JButton("Confirm");
-        confirmButton.addActionListener(e -> {
-            dialog.dispose();
-        });
+        confirmButton.addActionListener(e -> dialog.dispose());
         form.add(confirmButton, constraints);
         return form;
     }
@@ -113,11 +116,5 @@ public class CheckinDialog implements ItemListener {
     private void labelTemplate(JPanel panel, GridBagConstraints constraints, String name) {
         JLabel label = new JLabel(name);
         panel.add(label, constraints);
-    }
-
-    @Override
-    public void itemStateChanged(ItemEvent e) {
-        CardLayout cardLayout = (CardLayout) (forms.getLayout());
-        cardLayout.show(forms, (String) e.getItem());
     }
 }

@@ -1,14 +1,17 @@
-package jate.ui;
+package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
 import com.github.lgooddatepicker.components.DatePicker;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import java.awt.*;
 
-public class NewReservationPanel {
-    private JPanel panel;
+final class NewReservationPanel {
 
-    public NewReservationPanel() {
+    private final JPanel panel;
+
+    public NewReservationPanel(Window owner) {
         panel = new JPanel();
         panel.setName("New reservation");
         panel.setLayout(new GridBagLayout());
@@ -20,44 +23,42 @@ public class NewReservationPanel {
         panel.add(new JLabel("New reservation"), gbc);
 
         gbc.gridy++;
-        panel.add(createDatePickerPanel(), gbc);
+        panel.add(createDatePickers(), gbc);
 
         gbc.gridy++;
         panel.add(new ValidReservationBlock().getPanel(), gbc);
 
         JButton createReservationButton = new JButton("Create reservation");
-        createReservationButton.addActionListener(e -> {
-            PersonalDataDialog personalDataDialog = new PersonalDataDialog(); // TODO
-        });
+        createReservationButton.addActionListener(e -> new NewReservationDialog(owner));
 
         gbc.gridy++;
         panel.add(createReservationButton, gbc);
     }
 
-    private JPanel createDatePickerPanel() {
+    public JPanel getPanel() {
+        return panel;
+    }
+
+    private JPanel createDatePickers() {
         JPanel datePickerPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(0, 15, 0, 15);
 
-        datePickerPanel.add(createCheckPanel("in"), gbc);
-        datePickerPanel.add(createCheckPanel("out"), gbc);
+        datePickerPanel.add(createDatePickerField("Check-in date"), gbc);
+        datePickerPanel.add(createDatePickerField("Check-out date"), gbc);
 
         return datePickerPanel;
     }
 
-    private JPanel createCheckPanel(String inOrOut) {
-        JPanel checkPanel = new JPanel();
-        checkPanel.setLayout(new BorderLayout());
+    private JPanel createDatePickerField(String label) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
 
-        checkPanel.add(new Label(String.format("Check-%s date:", inOrOut)), BorderLayout.NORTH);
+        panel.add(new Label(label + ":"), BorderLayout.NORTH);
 
         DatePicker datePicker = new DatePicker();
-        checkPanel.add(datePicker, BorderLayout.SOUTH);
+        panel.add(datePicker, BorderLayout.SOUTH);
 
-        return checkPanel;
-    }
-
-    public JPanel getPanel() {
         return panel;
     }
 }

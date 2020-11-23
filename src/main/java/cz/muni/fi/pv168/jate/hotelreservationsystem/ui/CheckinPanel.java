@@ -1,7 +1,4 @@
-package jate.ui;
-
-import static java.awt.GridBagConstraints.CENTER;
-import static java.awt.GridBagConstraints.HORIZONTAL;
+package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
 import com.github.lgooddatepicker.components.DatePicker;
 
@@ -9,23 +6,31 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Window;
 
-public class CheckinPanel implements ActionListener {
+import static java.awt.GridBagConstraints.CENTER;
+import static java.awt.GridBagConstraints.HORIZONTAL;
+
+final class CheckinPanel {
+
     private final JPanel panel;
+    private final Window owner;
 
-    public CheckinPanel() {
+    CheckinPanel(Window owner) {
+        this.owner = owner;
         panel = createCheckinPanel();
-        panel.setName("Check-in");
+    }
+
+    public JPanel getPanel() {
+        return panel;
     }
 
     private JPanel createCheckinPanel() {
         JPanel panel = new JPanel();
+        panel.setName("Check-in");
 
         GridBagLayout layoutManager = new GridBagLayout();
         panel.setLayout(layoutManager);
@@ -74,15 +79,7 @@ public class CheckinPanel implements ActionListener {
 
     private void addFillInPersonalInfoButton(JPanel panel, GridBagConstraints constraints) {
         JButton button = new JButton("Fill in personal information");
-        button.addActionListener(this);
+        button.addActionListener(e -> new CheckinDialog(owner, 3));
         panel.add(button, constraints);
-    }
-
-    public JPanel getPanel() {
-        return panel;
-    }
-
-    public void actionPerformed(ActionEvent e) {
-        new CheckinDialog(3);
     }
 }

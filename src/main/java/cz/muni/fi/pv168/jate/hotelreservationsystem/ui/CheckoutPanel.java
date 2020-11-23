@@ -1,22 +1,31 @@
-package jate.ui;
+package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionListener;
+import java.util.Objects;
 
-public class CheckoutPanel implements ActionListener, ChangeListener {
+final class CheckoutPanel {
 
-    private GridBagConstraints gbc = new GridBagConstraints();
-    private JPanel panel = new JPanel();
+    private final GridBagConstraints gbc = new GridBagConstraints();
+    private final JPanel panel = new JPanel();
     private JComboBox<String> roomTypes;
-    private JLabel totalCost = new JLabel("0");
+    private final JLabel totalCost = new JLabel("0");
     private int sumPerNight;
     private JSpinner nights;
 
-    public CheckoutPanel() {
+    CheckoutPanel() {
         panel.setLayout(new GridBagLayout());
         panel.setName("Check-out");
         addHeading();
@@ -27,31 +36,32 @@ public class CheckoutPanel implements ActionListener, ChangeListener {
         addTitle("Payment Information");
         addFinalSum();
         addButton();
-
     }
 
-        private void addHeading(){
-            gbc.gridx = 1;
-            gbc.insets = new Insets(15,15,15,15);
-            addLabel("Check-out Form");
+    public JPanel getPanel() {
+        return panel;
+    }
 
-        }
+    private void addHeading() {
+        gbc.gridx = 1;
+        gbc.insets = new Insets(15, 15, 15, 15);
+        addLabel("Check-out Form");
+    }
 
     private void addTitle(String title) {
-        gbc.gridx --;
-        gbc.gridy ++ ;
+        gbc.gridx--;
+        gbc.gridy++;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(15,15,15,15);
+        gbc.insets = new Insets(15, 15, 15, 15);
         gbc.anchor = GridBagConstraints.CENTER;
         addLabel(title);
         gbc.ipady = 10;
         gbc.gridwidth = 1;
-        gbc.insets = new Insets(0,0,0,0);
+        gbc.insets = new Insets(0, 0, 0, 0);
         gbc.anchor = GridBagConstraints.FIRST_LINE_START;
     }
 
-    public void addGuestInformation() {
-
+    private void addGuestInformation() {
         addLabel("First Name:");
         addLabel("Last Name:");
         addLabel("Contact");
@@ -59,7 +69,6 @@ public class CheckoutPanel implements ActionListener, ChangeListener {
         gbc.gridx = 1;
         gbc.gridy = 2;
         gbc.ipady = 1;
-
 
         JTextField firstNameText = new JTextField(15);
         panel.add(firstNameText, gbc);
@@ -71,11 +80,9 @@ public class CheckoutPanel implements ActionListener, ChangeListener {
         gbc.gridy++;
         JTextField contact = new JTextField(15);
         panel.add(contact, gbc);
-
     }
 
-    public void addRoomInformation(){
-
+    private void addRoomInformation() {
         addLabel("Room number:");
         addLabel("Room type:");
         addLabel("Nights:");
@@ -89,11 +96,9 @@ public class CheckoutPanel implements ActionListener, ChangeListener {
 
         addRoomType();
         addNights();
-
     }
 
-    public void addFinalSum(){
-
+    private void addFinalSum() {
         addLabel("Total Cost:");
         addLabel("Payment method:");
 
@@ -104,30 +109,29 @@ public class CheckoutPanel implements ActionListener, ChangeListener {
         addPaymentMethod();
     }
 
-    public void addButton(){
-
-        gbc.gridx --;
-        gbc.gridy ++;
+    private void addButton() {
+        gbc.gridx--;
+        gbc.gridy++;
         gbc.anchor = GridBagConstraints.CENTER;
         JButton checkOut = new JButton("Check-out");
-        checkOut.addActionListener(this);
-        panel.add(checkOut,gbc);
-
+        checkOut.addActionListener(e -> {
+            // TODO
+        });
+        panel.add(checkOut, gbc);
     }
 
     private void addRoomType() {
         gbc.gridy++;
-        String[] roomTypeStrings = {"Select","1-bed room", "2-bed room", "3-bed room"};
+        String[] roomTypeStrings = {"1-bed room", "2-bed room", "3-bed room"};
         roomTypes = new JComboBox<>(roomTypeStrings);
-        roomTypes.addActionListener(this);
+        roomTypes.addActionListener(handleRoomTypeChange());
         panel.add(roomTypes, gbc);
     }
 
     private void addNights() {
-
         gbc.gridy++;
-        nights = new JSpinner(new SpinnerNumberModel(0,0,100,1));
-        nights.addChangeListener(this);
+        nights = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
+        nights.addChangeListener(handleNightCountChange());
         panel.add(nights, gbc);
     }
 
@@ -150,33 +154,28 @@ public class CheckoutPanel implements ActionListener, ChangeListener {
         panel.add(cardMethod, gbc);
     }
 
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == roomTypes){
-            JComboBox<String> copyRoomTypes = (JComboBox)e.getSource();
-            String types = (String)copyRoomTypes.getSelectedItem();
-            switch(types){
-                case "1-bed room": sumPerNight = 50;
+    public ActionListener handleRoomTypeChange() {
+        return e -> {
+            String type = (String) roomTypes.getSelectedItem();
+            switch (Objects.requireNonNull(type)) {
+                case "1-bed room":
+                    sumPerNight = 50;
                     break;
-                case "2-bed room": sumPerNight = 100;
+                case "2-bed room":
+                    sumPerNight = 100;
                     break;
-                case "3-bed room": sumPerNight = 150;
+                case "3-bed room":
+                    sumPerNight = 150;
                     break;
-                default: sumPerNight = 0;
             }
-            totalCost.setText(Integer.toString((Integer)nights.getValue()* sumPerNight));
-        }
-
+            totalCost.setText(Integer.toString((Integer) nights.getValue() * sumPerNight));
+        };
     }
 
-    @Override
-    public void stateChanged(ChangeEvent e) {
-        int cost = (Integer)nights.getValue()* sumPerNight;
-        totalCost.setText(Integer.toString(cost));
-    }
-
-    public JPanel getPanel() {
-        return panel;
+    public ChangeListener handleNightCountChange() {
+        return e -> {
+            int cost = (Integer) nights.getValue() * sumPerNight;
+            totalCost.setText(Integer.toString(cost));
+        };
     }
 }

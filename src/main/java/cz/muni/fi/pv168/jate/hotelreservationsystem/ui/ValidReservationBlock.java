@@ -1,18 +1,20 @@
-package jate.ui;
+package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 import java.awt.event.ActionListener;
 
-public class ValidReservationBlock {
-    public JPanel getPanel() {
-        return panel;
-    }
+final class ValidReservationBlock {
 
     private final JPanel panel;
 
-    public ValidReservationBlock() {
+    ValidReservationBlock() {
         panel = new JPanel();
         panel.setPreferredSize(new Dimension(300, 250));
 
@@ -23,6 +25,10 @@ public class ValidReservationBlock {
         addRoomTypeButton.addActionListener(handleRoomTypeAddition(addRoomTypeButton));
 
         panel.add(addRoomTypeButton);
+    }
+
+    public JPanel getPanel() {
+        return panel;
     }
 
     private ActionListener handleRoomTypeAddition(JButton addRoomTypeButton) {
