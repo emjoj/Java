@@ -1,11 +1,9 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
@@ -28,7 +26,8 @@ final class CheckoutPanel {
     CheckoutPanel() {
         panel.setLayout(new GridBagLayout());
         panel.setName("Check-out");
-        addHeading();
+        addRoomNumber();
+
         addTitle("Guest Information");
         addGuestInformation();
         addTitle("Room Information");
@@ -42,11 +41,16 @@ final class CheckoutPanel {
         return panel;
     }
 
-    private void addHeading() {
+    private void addRoomNumber() {
+        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+        addLabel("Room number:");
+
         gbc.gridx = 1;
-        gbc.insets = new Insets(15, 15, 15, 15);
-        addLabel("Check-out Form");
+        JTextField roomNumber = new JTextField(15);
+        panel.add(roomNumber, gbc);
     }
+
+
 
     private void addTitle(String title) {
         gbc.gridx--;
@@ -64,7 +68,6 @@ final class CheckoutPanel {
     private void addGuestInformation() {
         addLabel("First Name:");
         addLabel("Last Name:");
-        addLabel("Contact");
 
         gbc.gridx = 1;
         gbc.gridy = 2;
@@ -76,42 +79,37 @@ final class CheckoutPanel {
         gbc.gridy++;
         JTextField lastNameText = new JTextField(15);
         panel.add(lastNameText, gbc);
-
-        gbc.gridy++;
-        JTextField contact = new JTextField(15);
-        panel.add(contact, gbc);
     }
 
     private void addRoomInformation() {
-        addLabel("Room number:");
         addLabel("Room type:");
+        addLabel("Price per night:");
         addLabel("Nights:");
 
         gbc.gridx = 1;
-        gbc.gridy = 6;
+        gbc.gridy = 5;
         gbc.ipady = 1;
 
-        JTextField roomNumber = new JTextField(15);
-        panel.add(roomNumber, gbc);
-
         addRoomType();
+        gbc.gridy++;
+        JTextField price = new JTextField(15);
+        panel.add(price, gbc);
         addNights();
     }
 
     private void addFinalSum() {
         addLabel("Total Cost:");
-        addLabel("Payment method:");
 
         gbc.gridx = 1;
-        gbc.gridy = 10;
+        gbc.gridy = 9;
 
         panel.add(totalCost, gbc);
-        addPaymentMethod();
     }
 
     private void addButton() {
         gbc.gridx--;
         gbc.gridy++;
+        gbc.gridwidth =2;
         gbc.anchor = GridBagConstraints.CENTER;
         JButton checkOut = new JButton("Check-out");
         checkOut.addActionListener(e -> {
@@ -121,7 +119,6 @@ final class CheckoutPanel {
     }
 
     private void addRoomType() {
-        gbc.gridy++;
         String[] roomTypeStrings = {"1-bed room", "2-bed room", "3-bed room"};
         roomTypes = new JComboBox<>(roomTypeStrings);
         roomTypes.addActionListener(handleRoomTypeChange());
@@ -138,20 +135,6 @@ final class CheckoutPanel {
     private void addLabel(String s) {
         panel.add(new JLabel(s), gbc);
         gbc.gridy++;
-    }
-
-    private void addPaymentMethod() {
-        gbc.gridy++;
-        JRadioButton cashMethod = new JRadioButton("Cash");
-        JRadioButton cardMethod = new JRadioButton("Card");
-
-        ButtonGroup paymentMethod = new ButtonGroup();
-        paymentMethod.add(cashMethod);
-        paymentMethod.add(cardMethod);
-
-        panel.add(cashMethod, gbc);
-        gbc.gridx++;
-        panel.add(cardMethod, gbc);
     }
 
     public ActionListener handleRoomTypeChange() {
