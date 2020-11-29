@@ -1,9 +1,10 @@
-package jate.ui;
+package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
-public class Dashboard {
+public final class Dashboard {
+
     private final JFrame frame;
 
     public Dashboard() {
@@ -17,7 +18,9 @@ public class Dashboard {
     private JFrame createFrame() {
         var frame = new JFrame("Hotel Reservation System");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setSize(1000, 700);
+        frame.add(new TabPaneCreator(frame).getTabbedPane());
+        frame.pack();
+        frame.setLocationRelativeTo(null);
         return frame;
     }
 
