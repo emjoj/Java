@@ -112,7 +112,7 @@ final class CheckoutPanel {
     private void addButton() {
         gbc.gridx--;
         gbc.gridy++;
-        gbc.gridwidth =2;
+        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         JButton checkOut = new JButton("Check-out");
         checkOut.addActionListener(e -> {
