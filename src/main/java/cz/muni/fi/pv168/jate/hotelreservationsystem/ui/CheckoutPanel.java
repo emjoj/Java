@@ -74,10 +74,12 @@ final class CheckoutPanel {
         gbc.ipady = 1;
 
         JTextField firstNameText = new JTextField(15);
+        firstNameText.setEnabled(false);
         panel.add(firstNameText, gbc);
 
         gbc.gridy++;
         JTextField lastNameText = new JTextField(15);
+        lastNameText.setEnabled(false);
         panel.add(lastNameText, gbc);
     }
 
@@ -92,8 +94,9 @@ final class CheckoutPanel {
 
         addRoomType();
         gbc.gridy++;
-        JTextField price = new JTextField(15);
-        panel.add(price, gbc);
+        JTextField priceText = new JTextField(15);
+        priceText.setEnabled(false);
+        panel.add(priceText, gbc);
         addNights();
     }
 
