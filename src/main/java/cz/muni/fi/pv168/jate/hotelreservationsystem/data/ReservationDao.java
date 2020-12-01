@@ -1,26 +1,24 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.data;
 
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Person;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Reservation;
 
 import javax.sql.DataSource;
 import java.sql.Date;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
-public class PersonDao {
-
+public class ReservationDao {
     private final DataSource dataSource;
 
-    public PersonDao(DataSource dataSource){
+    public ReservationDao(DataSource dataSource) {
         this.dataSource = dataSource;
         initTable();
     }
 
-    public void create(Person person) {
-        if (person.getId() != null) {
+    public void create(Reservation reservation) {
+        if (reservation.getId() != null) {
             throw new IllegalArgumentException("Person already has ID: " + person);
         }
         try (var connection = dataSource.getConnection();
@@ -48,7 +46,7 @@ public class PersonDao {
     }
 
     private void initTable() {
-        if (!tableExists("PERSON")) {
+        if (!tableExists("RESERVATION")) {
             createTable();
         }
     }
@@ -62,58 +60,30 @@ public class PersonDao {
         }
     }
 
-
-    public List<Person> findAll() {
-        try (var connection = dataSource.getConnection();
-             var st = connection.prepareStatement("SELECT ID, FIRST_NAME, LAST_NAME, BIRTH_DATE," +
-                     " EVIDENCE, EMAIL, PHONE_NUMBER FROM PERSON")) {
-
-            List<Person> persons = new ArrayList<>();
-            try (var rs = st.executeQuery()) {
-                while (rs.next()) {
-                    Person person = new Person(
-                            rs.getString("FIRST_NAME"),
-                            rs.getString("LAST_NAME"),
-                            rs.getDate("BIRTH_DATE").toLocalDate(),
-                            rs.getString("EVIDENCE"));
-                    person.setEmail(rs.getString("EMAIL"));
-                    person.setPhoneNumber(rs.getString("PHONE_NUMBER"));
-                    person.setId(rs.getLong("ID"));
-                    persons.add(person);
-                }
-            }
-            return persons;
-        } catch (SQLException ex) {
-            throw new DataAccessException("Failed to load all persons", ex);
-        }
-    }
-
     private void createTable() {
         try (var connection = dataSource.getConnection();
              var st = connection.createStatement()) {
 
-            st.executeUpdate("CREATE TABLE PERSON (" +
+            st.executeUpdate("CREATE TABLE RESERVATION (" +
                     "ID BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +
-                    "FIRST_NAME VARCHAR(100) NOT NULL," +
-                    "LAST_NAME VARCHAR(100) NOT NULL," +
-                    "BIRTH_DATE DATE NOT NULL," +
-                    "EVIDENCE VARCHAR(100) NOT NULL," +
-                    "EMAIL VARCHAR(100)," +
-                    "PHONE_NUMBER VARCHAR(100)" +
+                    "OWNERID BIGINT NOT NULL REFERENCES PERSON(ID)," +
+                    "ROOMID BIGINT NOT NULL," +
+                    "CHECKIN DATE NOT NULL," +
+                    "CHECKOUT DATE NOT NULL" +
                     ")");
         } catch (SQLException ex) {
-            throw new DataAccessException("Failed to create PERSON table", ex);
+            throw new DataAccessException("Failed to create RESERVATION table", ex);
         }
     }
 
-    private void DropTable() {
+    public void dropTable() {
         try (var connection = dataSource.getConnection();
              var st = connection.createStatement()) {
 
-            st.executeUpdate("DROP TABLE EMPLOYEE");
+            st.executeUpdate("DROP TABLE RESERVATION");
         } catch (SQLException ex) {
-            throw new DataAccessException("Failed to drop PERSON table", ex);
+            throw new DataAccessException("Failed to drop RESERVATION table", ex);
         }
-
     }
+
 }
