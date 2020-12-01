@@ -3,7 +3,7 @@ package cz.muni.fi.pv168.jate.hotelreservationsystem.model;
 import java.time.LocalDate;
 
 public class Reservation {
-    private Long id;
+    private long id;
     private Person creator;
     private Room room;
     private LocalDate from;
@@ -16,11 +16,11 @@ public class Reservation {
         this.to = to;
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 

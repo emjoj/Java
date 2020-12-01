@@ -5,7 +5,7 @@ import java.util.Objects;
 
 public class Person {
 
-    private Long id;
+    private long id;
     private String firstName;
     private String lastName;
     private LocalDate birthDate;
@@ -30,11 +30,11 @@ public class Person {
         this.contactEmail = contactEmail;
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
