@@ -5,36 +5,27 @@ import java.util.Objects;
 
 public class Person {
 
-    private long id;
+    private Long id;
     private String firstName;
     private String lastName;
     private LocalDate birthDate;
     private String evidenceID;
-    private String email;
     private String phoneNumber;
+    private String email;
 
-    public Person(String firstName, String lastName, LocalDate birthDate, String evidenceID,
-                  String email, String phoneNumber) {
+    public Person(String firstName, String lastName, LocalDate birthDate, String evidenceID, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthDate = birthDate;
         this.evidenceID = evidenceID;
         this.email = email;
-        this.phoneNumber = phoneNumber;
     }
 
-    public Person(String firstName, String lastName, String phoneNumber, String email) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-    }
-
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -43,7 +34,7 @@ public class Person {
     }
 
     public void setFirstName(String firstName) {
-        this.firstName = Objects.requireNonNull(firstName, "firstName must not be null");
+        this.firstName = Objects.requireNonNull(firstName, "First name must not be null");
     }
 
     public String getLastName() {
@@ -51,7 +42,7 @@ public class Person {
     }
 
     public void setLastName(String lastName) {
-        this.lastName = Objects.requireNonNull(lastName, "lastName must not be null");
+        this.lastName = Objects.requireNonNull(lastName, "Last name must not be null");
     }
 
     public LocalDate getBirthDate() {
@@ -59,7 +50,7 @@ public class Person {
     }
 
     public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = Objects.requireNonNull(birthDate, "birthDate must not be null");
+        this.birthDate = Objects.requireNonNull(birthDate, "Birth date must not be null");
     }
 
     public String getEvidenceID() {
@@ -67,7 +58,15 @@ public class Person {
     }
 
     public void setEvidenceID(String evidenceID) {
-        this.evidenceID = evidenceID;
+        this.evidenceID = Objects.requireNonNull(evidenceID, "Evidence ID must not be null");
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = Objects.requireNonNull(phoneNumber, "Phone number must not be null");
     }
 
     public String getEmail() {
@@ -76,14 +75,6 @@ public class Person {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
     }
 
     @Override

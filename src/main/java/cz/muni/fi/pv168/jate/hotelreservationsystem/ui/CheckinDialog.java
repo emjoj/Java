@@ -67,7 +67,6 @@ final class CheckinDialog {
         DefaultComboBoxModel model = new DefaultComboBoxModel(updatedItems);
         popUpMenu.setModel(model);
 
-        List<ComponentListener> a;
         if (isAlreadyFilled())
             for (Component form : forms.getComponents()) {
                 Component confirmButton = form.getComponentAt(451, 293);
