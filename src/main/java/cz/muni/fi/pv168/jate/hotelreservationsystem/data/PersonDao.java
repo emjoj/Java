@@ -16,6 +16,7 @@ public class PersonDao {
 
     public PersonDao(DataSource dataSource){
         this.dataSource = dataSource;
+        initTable();
     }
 
     public void create(Person person) {
@@ -45,6 +46,22 @@ public class PersonDao {
             throw new DataAccessException("Failed to store person" + person, ex);
         }
     }
+
+    private void initTable() {
+        if (!tableExits("EMPLOYEE")) {
+            createTable();
+        }
+    }
+
+    private boolean tableExits( String tableName) {
+        try (var connection = dataSource.getConnection();
+             var rs = connection.getMetaData().getTables(null, null, tableName, null)) {
+            return rs.next();
+        } catch (SQLException ex) {
+            throw new DataAccessException("Failed to detect if the table " + tableName + " exist", ex);
+        }
+    }
+
 
     public List<Person> findAll() {
         try (var connection = dataSource.getConnection();
@@ -86,5 +103,16 @@ public class PersonDao {
         } catch (SQLException ex) {
             throw new DataAccessException("Failed to create PERSON table", ex);
         }
+    }
+
+    private void DropTable() {
+        try (var connection = dataSource.getConnection();
+             var st = connection.createStatement()) {
+
+            st.executeUpdate("DROP TABLE EMPLOYEE");
+        } catch (SQLException ex) {
+            throw new DataAccessException("Failed to drop EMPLOYEE table", ex);
+        }
+
     }
 }
