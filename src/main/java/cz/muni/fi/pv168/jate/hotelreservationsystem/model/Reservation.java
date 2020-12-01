@@ -4,16 +4,16 @@ import java.time.LocalDate;
 
 public class Reservation {
     private long id;
-    private Person creator;
+    private Person owner;
     private Room room;
-    private LocalDate from;
-    private LocalDate to;
+    private LocalDate checkinDate;
+    private LocalDate checkoutDate;
 
-    public Reservation(Person creator, Room room, LocalDate from, LocalDate to) {
-        this.creator = creator;
+    public Reservation(Person owner, Room room, LocalDate checkinDate, LocalDate checkoutDate) {
+        this.owner = owner;
         this.room = room;
-        this.from = from;
-        this.to = to;
+        this.checkinDate = checkinDate;
+        this.checkoutDate = checkoutDate;
     }
 
     public long getId() {
@@ -24,12 +24,12 @@ public class Reservation {
         this.id = id;
     }
 
-    public Person getCreator() {
-        return creator;
+    public Person getOwner() {
+        return owner;
     }
 
-    public void setCreator(Person creator) {
-        this.creator = creator;
+    public void setOwner(Person owner) {
+        this.owner = owner;
     }
 
     public Room getRoom() {
@@ -40,19 +40,19 @@ public class Reservation {
         this.room = room;
     }
 
-    public LocalDate getFrom() {
-        return from;
+    public LocalDate getCheckinDate() {
+        return checkinDate;
     }
 
-    public void setFrom(LocalDate from) {
-        this.from = from;
+    public void setCheckinDate(LocalDate checkinDate) {
+        this.checkinDate = checkinDate;
     }
 
-    public LocalDate getTo() {
-        return to;
+    public LocalDate getCheckoutDate() {
+        return checkoutDate;
     }
 
-    public void setTo(LocalDate to) {
-        this.to = to;
+    public void setCheckoutDate(LocalDate checkoutDate) {
+        this.checkoutDate = checkoutDate;
     }
 }

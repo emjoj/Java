@@ -10,24 +10,24 @@ public class Person {
     private String lastName;
     private LocalDate birthDate;
     private String evidenceID;
-    private String contactEmail;
-    private String contactTelephone;
+    private String email;
+    private String phoneNumber;
 
     public Person(String firstName, String lastName, LocalDate birthDate, String evidenceID,
-                  String contactEmail, String contactTelephone) {
+                  String email, String phoneNumber) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthDate = birthDate;
         this.evidenceID = evidenceID;
-        this.contactEmail = contactEmail;
-        this.contactTelephone = contactTelephone;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
     }
 
-    public Person(String firstName, String lastName, String contactTelephone, String contactEmail) {
+    public Person(String firstName, String lastName, String phoneNumber, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.contactTelephone = contactTelephone;
-        this.contactEmail = contactEmail;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
     }
 
     public long getId() {
@@ -70,32 +70,32 @@ public class Person {
         this.evidenceID = evidenceID;
     }
 
-    public String getContactEmail() {
-        return contactEmail;
+    public String getEmail() {
+        return email;
     }
 
-    public void setContactEmail(String contactEmail) {
-        this.contactEmail = contactEmail;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public String getContactTelephone() {
-        return contactTelephone;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setContactTelephone(String contactTelephone) {
-        this.contactTelephone = contactTelephone;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     @Override
     public String toString() {
         return "Person{" +
-                ", firstName='" + firstName + '\'' +
+                " firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", birthDate=" + birthDate +
                 ", evidenceID='" + evidenceID + '\'' +
-                ", contactEmail='" + contactEmail + '\'' +
-                ", contactTelephone='" + contactTelephone + '\'' +
-                "id=" + id +
+                ", email='" + email + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", id=" + id +
                 '}';
     }
 }
