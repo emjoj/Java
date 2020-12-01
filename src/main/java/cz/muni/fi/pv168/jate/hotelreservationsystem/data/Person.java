@@ -9,12 +9,17 @@ public class Person {
     private String firstName;
     private String lastName;
     private LocalDate birthDate;
-    private Reservation reservation;
+    private String document;
+    private String contact;
+    private long reservationId;
 
-    public Person(String firstName, String lastName, LocalDate birthDate) {
+    public Person(String firstName, String lastName, LocalDate birthDate, String document, String contact) {
+
         setFirstName(firstName);
         setLastName(lastName);
         setBirthDate(birthDate);
+        setDocument(document);
+        setContact(contact);
     }
 
     public Long getId() {
@@ -49,21 +54,20 @@ public class Person {
         this.birthDate = Objects.requireNonNull(birthDate, "birthDate must not be null");
     }
 
-    public Reservation getReservation() {
-        return reservation;
+    public String getDocument() {return document;}
+
+    public void setDocument(String document){this.document = document;}
+
+    public String getContact() {return contact;}
+
+    public void setContact(String contact){this.contact = contact;}
+
+    public long getReservationId() {
+        return reservationId;
     }
 
-    public void setDepartment(Reservation reservation) {
-        this.reservation = reservation;
+    public void setReservationId(long reservationId) { this.reservationId = reservationId;
     }
 
-    @Override
-    public String toString() {
-        return "'" + firstName + '\'' +
-                " '" + lastName + '\'' +
-                ", born " + birthDate +
-                ", from {" + reservation + "}" +
-                " (ID " + id + ")";
-    }
 
 }

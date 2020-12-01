@@ -22,19 +22,21 @@ public class PersonDao {
         }
         try (var connection = dataSource.getConnection();
              var st = connection.prepareStatement(
-                     "INSERT INTO PERSON (FIRST_NAME, LAST_NAME, BIRTH_DATE, RESERVATION_ID) VALUES (?, ?, ?, ?)",
+                     "INSERT INTO PERSON (FIRST_NAME, LAST_NAME, BIRTH_DATE, DOCUMENT, CONTACT, RESERVATION_ID) VALUES (?, ?, ?, ?, ?, ?)",
                      RETURN_GENERATED_KEYS)) {
             st.setString(1, person.getFirstName());
             st.setString(2, person.getLastName());
             st.setDate(3, Date.valueOf(person.getBirthDate()));
-            var reservation = person.getReservation();
+            st.setString(4, person.getDocument());
+            st.setString(5, person.getContact());
+            var reservation = person.getReservationId();
 
             /*to work reservation class needs to be created
 
             if (reservation == null) {
-                st.setNull(4, Types.BIGINT);
+                st.setNull(6, Types.BIGINT);
             } else {
-                st.setLong(4, reservation.getId());
+                st.setLong(6, reservation.getId());
             }
             */
             st.executeUpdate();
@@ -54,7 +56,7 @@ public class PersonDao {
 
     public List<Person> findAll() {
         try (var connection = dataSource.getConnection();
-             var st = connection.prepareStatement("SELECT ID, FIRST_NAME, LAST_NAME, BIRTH_DATE, RESERVATION_ID FROM PERSON")) {
+             var st = connection.prepareStatement("SELECT ID, FIRST_NAME, LAST_NAME, BIRTH_DATE, DOCUMENT, CONTACT, RESERVATION_ID FROM PERSON")) {
 
             List<Person> persons = new ArrayList<>();
             try (var rs = st.executeQuery()) {
@@ -62,7 +64,9 @@ public class PersonDao {
                     Person person = new Person(
                             rs.getString("FIRST_NAME"),
                             rs.getString("LAST_NAME"),
-                            rs.getDate("BIRTH_DATE").toLocalDate());
+                            rs.getDate("BIRTH_DATE").toLocalDate(),
+                            rs.getString("DOCUMENT"),
+                            rs.getString("CONTACT"));
                     person.setId(rs.getLong("ID"));
                     var reservationId = rs.getLong("RESERVATION_ID");
                     /*if (!rs.wasNull())*/
@@ -86,6 +90,8 @@ public class PersonDao {
                     "FIRST_NAME VARCHAR(100) NOT NULL," +
                     "LAST_NAME VARCHAR(100) NOT NULL," +
                     "BIRTH_DATE DATE NOT NULL," +
+                    "DOCUMENT VARCHAR(100) NOT NULL," +
+                    "CONTACT VARCHAR(100) NOT NULL," +
                     "RESERVATION_ID BIGINT REFERENCES APP.RESERVATION(ID)" +
                     ")");
         } catch (SQLException ex) {
