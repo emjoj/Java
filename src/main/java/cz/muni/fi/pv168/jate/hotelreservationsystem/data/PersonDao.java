@@ -65,7 +65,8 @@ public class PersonDao {
 
     public List<Person> findAll() {
         try (var connection = dataSource.getConnection();
-             var st = connection.prepareStatement("SELECT ID, FIRST_NAME, LAST_NAME, BIRTH_DATE, EVIDENCE, EMAIL, PHONE_NUMBER FROM PERSON")) {
+             var st = connection.prepareStatement("SELECT ID, FIRST_NAME, LAST_NAME, BIRTH_DATE," +
+                     " EVIDENCE, EMAIL, PHONE_NUMBER FROM PERSON")) {
 
             List<Person> persons = new ArrayList<>();
             try (var rs = st.executeQuery()) {
@@ -96,7 +97,7 @@ public class PersonDao {
                     "FIRST_NAME VARCHAR(100) NOT NULL," +
                     "LAST_NAME VARCHAR(100) NOT NULL," +
                     "BIRTH_DATE DATE NOT NULL," +
-                    "EVIDENCE VARCHAR(100)," +
+                    "EVIDENCE VARCHAR(100) NOT NULL," +
                     "EMAIL VARCHAR(100)," +
                     "PHONE_NUMBER VARCHAR(100)" +
                     ")");
