@@ -13,12 +13,11 @@ public class Person {
     private String phoneNumber;
     private String email;
 
-    public Person(String firstName, String lastName, LocalDate birthDate, String evidenceID, String email) {
+    public Person(String firstName, String lastName, LocalDate birthDate, String evidenceID) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthDate = birthDate;
         this.evidenceID = evidenceID;
-        this.email = email;
     }
 
     public Long getId() {
@@ -66,7 +65,7 @@ public class Person {
     }
 
     public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = Objects.requireNonNull(phoneNumber, "Phone number must not be null");
+        this.phoneNumber = phoneNumber;
     }
 
     public String getEmail() {
@@ -84,8 +83,8 @@ public class Person {
                 ", lastName='" + lastName + '\'' +
                 ", birthDate=" + birthDate +
                 ", evidenceID='" + evidenceID + '\'' +
-                ", email='" + email + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
+                ", email='" + email + '\'' +
                 ", id=" + id +
                 '}';
     }
