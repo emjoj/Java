@@ -1,13 +1,10 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static java.awt.GridBagConstraints.HORIZONTAL;
@@ -16,21 +13,26 @@ final class CheckinDialog {
 
     private final JPanel forms;
     private final JDialog dialog;
+    private final JComboBox popUpMenu;
+    private final boolean[] areFormsFilled;
 
     CheckinDialog(Window owner, int numberOfPanels) {
+        areFormsFilled = new boolean[numberOfPanels];
+        Arrays.fill(areFormsFilled, false);
+
         forms = new JPanel(new CardLayout());
 
         JPanel popupMenuPanel = new JPanel();
-        createPopupMenu(numberOfPanels, popupMenuPanel);
-
+        popUpMenu = createPopupMenu(numberOfPanels, popupMenuPanel);
         dialog = createDialog(owner);
         dialog.add(popupMenuPanel, BorderLayout.PAGE_START);
         dialog.add(forms, BorderLayout.CENTER);
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
+        dialog.pack();
     }
 
-    private void createPopupMenu(int numberOfPanels, JPanel popupMenuPanel) {
+    private JComboBox createPopupMenu(int numberOfPanels, JPanel popupMenuPanel) {
         JComboBox popupMenu = new JComboBox(createForms(numberOfPanels).toArray());
         popupMenu.setEditable(false);
         popupMenu.addItemListener(e -> {
@@ -38,15 +40,47 @@ final class CheckinDialog {
             cardLayout.show(forms, (String) e.getItem());
         });
         popupMenuPanel.add(popupMenu);
+        return popupMenu;
     }
 
     private List<String> createForms(int numberOfPanels) {
         List<String> comboBoxItems = new ArrayList<>();
         for (int i = 1; i <= numberOfPanels; i++) {
-            forms.add(createSingleForm(i), "Person number " + i);
-            comboBoxItems.add("Person number " + i);
+            forms.add(createSingleForm(i), "Person " + i);
+            comboBoxItems.add("Person " + i);
         }
         return comboBoxItems;
+    }
+
+    private void updateComboBoxItems(String personName, int index) {
+        String[] updatedItems = new String[popUpMenu.getItemCount()];
+        for (int i = 0; i < popUpMenu.getItemCount(); i++) {
+            if (i == index) {
+                forms.add(forms.getComponent(i), personName, i);
+                updatedItems[i] = personName;
+                areFormsFilled[i] = true;
+            } else {
+                updatedItems[i] = popUpMenu.getItemAt(i).toString();
+            }
+        }
+
+        DefaultComboBoxModel model = new DefaultComboBoxModel(updatedItems);
+        popUpMenu.setModel(model);
+
+        if (isAlreadyFilled())
+            for (Component form : forms.getComponents()) {
+                Component confirmButton = form.getComponentAt(451, 293);
+                confirmButton.setEnabled(true);
+            }
+    }
+
+    private boolean isAlreadyFilled() {
+        for (boolean formFilled : areFormsFilled) {
+            if (!formFilled) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private JDialog createDialog(Window owner) {
@@ -58,63 +92,59 @@ final class CheckinDialog {
     }
 
     private JPanel createSingleForm(int number) {
+ 
         JPanel form = new JPanel();
         GridBagLayout layoutManager = new GridBagLayout();
         form.setLayout(layoutManager);
 
         GridBagConstraints constraints = new GridBagConstraints();
-        constraints.weightx = 1;
-        constraints.weighty = 1;
 
         constraints.ipady = 10;
         constraints.insets = new Insets(10, 10, 10, 10);
         constraints.fill = HORIZONTAL;
 
         constraints.gridy = 1;
-        labelTemplate(form, constraints, "Person number " + number);
-        constraints.gridy++;
-        addName(form, constraints);
-        constraints.gridy++;
-        labelAndTextboxTemplate(form, constraints, "Date of birth:");
-        labelAndTextboxTemplate(form, constraints, "Place of birth:");
-        constraints.gridy++;
-        labelAndTextboxTemplate(form, constraints, "Address:");
-        labelAndTextboxTemplate(form, constraints, "City:");
+        JLabel personLabel = new JLabel("Person " + number);
+        form.add(personLabel, constraints);
         constraints.gridy++;
 
-        labelAndTextboxTemplate(form, constraints, "Country:");
-        labelAndTextboxTemplate(form, constraints, "Nationality:");
+        JLabel nameLabel = new JLabel("Name:");
+        form.add(nameLabel, constraints);
+
+        JTextField firstNameTextField = new JTextField(10);
+        firstNameTextField.setEditable(true);
+        form.add(firstNameTextField, constraints);
+
+        JTextField lastNameTextField = new JTextField(10);
+        lastNameTextField.setEditable(true);
+        form.add(lastNameTextField, constraints);
         constraints.gridy++;
-        labelTemplate(form, constraints, "Contact:");
+
+        JLabel dateOfBirthLabel = new JLabel("Date of birth:");
+        form.add(dateOfBirthLabel, constraints);
+
+        JTextField dateOfBirthTextField = new JTextField(10);
+        dateOfBirthTextField.setEditable(true);
+        form.add(dateOfBirthTextField, constraints);
         constraints.gridy++;
-        labelAndTextboxTemplate(form, constraints, "Telephone:");
-        labelAndTextboxTemplate(form, constraints, "Email: ");
+
+        JLabel idCardLabel = new JLabel("Identity card number:");
+        form.add(idCardLabel, constraints);
+
+        JTextField idCardTextField = new JTextField(10);
+        idCardTextField.setEditable(true);
+        form.add(idCardTextField, constraints);
         constraints.gridy++;
+
         JButton confirmButton = new JButton("Confirm");
+        confirmButton.setEnabled(false);
         confirmButton.addActionListener(e -> dialog.dispose());
+
+        JButton saveButton = new JButton("Save");
+        saveButton.addActionListener(e -> updateComboBoxItems(firstNameTextField.getText(), number - 1));
+        form.add(saveButton, constraints);
         form.add(confirmButton, constraints);
+
         return form;
-    }
-
-    private void addName(JPanel panel, GridBagConstraints constraints) {
-        labelAndTextboxTemplate(panel, constraints, "Name:");
-
-        JTextField lastName = new JTextField(10);
-        lastName.setEditable(true);
-        panel.add(lastName, constraints);
-    }
-
-    private void labelAndTextboxTemplate(JPanel panel, GridBagConstraints constraints, String s) {
-        JLabel date = new JLabel(s);
-        panel.add(date, constraints);
-
-        JTextField dateTextBox = new JTextField(10);
-        dateTextBox.setEditable(true);
-        panel.add(dateTextBox, constraints);
-    }
-
-    private void labelTemplate(JPanel panel, GridBagConstraints constraints, String name) {
-        JLabel label = new JLabel(name);
-        panel.add(label, constraints);
     }
 }
