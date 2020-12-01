@@ -2,14 +2,8 @@ package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
 import com.github.lgooddatepicker.components.DatePicker;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Window;
+import javax.swing.*;
+import java.awt.*;
 
 import static java.awt.GridBagConstraints.CENTER;
 import static java.awt.GridBagConstraints.HORIZONTAL;
@@ -53,11 +47,11 @@ final class CheckinPanel {
         constraints.gridy++;
         addNumeralLabel(panel, constraints, "Room number: ");
         constraints.gridy++;
-        addNumeralLabel(panel, constraints, "Number of people: ");
+        JTextField numberOfPeople = addNumeralLabel(panel, constraints, "Number of people: ");
         constraints.gridy++;
 
         constraints.fill = CENTER;
-        addFillInPersonalInfoButton(panel, constraints);
+        addFillInPersonalInfoButton(panel, constraints, numberOfPeople);
     }
 
     private void addDateLabel(JPanel panel, GridBagConstraints constraints, String name) {
@@ -68,18 +62,20 @@ final class CheckinPanel {
         panel.add(datePicker, constraints);
     }
 
-    private void addNumeralLabel(JPanel panel, GridBagConstraints constraints, String name) {
+    private JTextField addNumeralLabel(JPanel panel, GridBagConstraints constraints, String name) {
         JLabel checkout = new JLabel(name);
         panel.add(checkout, constraints);
 
         JTextField textField = new JTextField(5);
         textField.setEditable(true);
         panel.add(textField, constraints);
+        return textField;
     }
 
-    private void addFillInPersonalInfoButton(JPanel panel, GridBagConstraints constraints) {
+    private void addFillInPersonalInfoButton(JPanel panel, GridBagConstraints constraints, JTextField numberOfPanels) {
         JButton button = new JButton("Fill in personal information");
-        button.addActionListener(e -> new CheckinDialog(owner, 3));
+        button.addActionListener(e ->
+                new CheckinDialog(owner, Integer.parseInt(numberOfPanels.getText())));
         panel.add(button, constraints);
     }
 }
