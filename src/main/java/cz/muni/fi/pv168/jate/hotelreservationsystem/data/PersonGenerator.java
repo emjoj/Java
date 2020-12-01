@@ -44,8 +44,7 @@ public class PersonGenerator {
                 (char) (random.nextInt(26) + 'A'),
                 random.ints(100000, 999999).toString());
         String phoneNumber = "+421" + random.ints(100000000, 999999999);
-        String email = "random@email.com";
-        return new Person(firstName, lastName, birthDate, evidenceID, email, phoneNumber);
+        return new Person(firstName, lastName, birthDate, evidenceID, phoneNumber);
     }
 
     private String selectRandomString(List<String> data) {
