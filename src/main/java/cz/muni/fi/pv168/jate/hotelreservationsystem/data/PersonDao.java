@@ -48,7 +48,7 @@ public class PersonDao {
     }
 
     private void initTable() {
-        if (!tableExits("EMPLOYEE")) {
+        if (!tableExits("PERSON")) {
             createTable();
         }
     }
@@ -75,8 +75,8 @@ public class PersonDao {
                             rs.getString("FIRST_NAME"),
                             rs.getString("LAST_NAME"),
                             rs.getDate("BIRTH_DATE").toLocalDate(),
-                            rs.getString("EVIDENCE"),
-                            rs.getString("EMAIL"));
+                            rs.getString("EVIDENCE"));
+                    person.setEmail(rs.getString("EMAIL"));
                     person.setPhoneNumber(rs.getString("PHONE_NUMBER"));
                     person.setId(rs.getLong("ID"));
                     persons.add(person);
@@ -112,7 +112,7 @@ public class PersonDao {
 
             st.executeUpdate("DROP TABLE EMPLOYEE");
         } catch (SQLException ex) {
-            throw new DataAccessException("Failed to drop EMPLOYEE table", ex);
+            throw new DataAccessException("Failed to drop PERSON table", ex);
         }
 
     }
