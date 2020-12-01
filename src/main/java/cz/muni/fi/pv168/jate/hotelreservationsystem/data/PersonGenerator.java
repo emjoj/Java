@@ -38,13 +38,12 @@ public class PersonGenerator {
                 selectRandomString(FEMALE_FIRST_NAMES) :
                 selectRandomString(MALE_FIRST_NAMES);
         String lastName = selectRandomString(LAST_NAMES);
-        LocalDate birthDate = selectRandomLocalDate(MIN_BIRTH_DATE, MAX_BIRTH_DATE);
+        LocalDate birthDate = selectRandomLocalDate();
         String evidenceID = String.format("%c%c%s",
                 (char) (random.nextInt(26) + 'A'),
                 (char) (random.nextInt(26) + 'A'),
                 random.ints(100000, 999999).toString());
-        String phoneNumber = "+421" + random.ints(100000000, 999999999);
-        return new Person(firstName, lastName, birthDate, evidenceID, phoneNumber);
+        return new Person(firstName, lastName, birthDate, evidenceID);
     }
 
     private String selectRandomString(List<String> data) {
@@ -52,9 +51,9 @@ public class PersonGenerator {
         return data.get(index);
     }
 
-    private LocalDate selectRandomLocalDate(LocalDate min, LocalDate max) {
-        int maxDays = Math.toIntExact(DAYS.between(min, max) + 1);
+    private LocalDate selectRandomLocalDate() {
+        int maxDays = Math.toIntExact(DAYS.between(PersonGenerator.MIN_BIRTH_DATE, PersonGenerator.MAX_BIRTH_DATE) + 1);
         int days = random.nextInt(maxDays);
-        return min.plusDays(days);
+        return PersonGenerator.MIN_BIRTH_DATE.plusDays(days);
     }
 }
