@@ -1,8 +1,9 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
+import com.github.lgooddatepicker.components.DatePicker;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +30,6 @@ final class CheckinDialog {
         dialog.add(forms, BorderLayout.CENTER);
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-        dialog.pack();
     }
 
     private JComboBox createPopupMenu(int numberOfPanels, JPanel popupMenuPanel) {
@@ -86,13 +86,13 @@ final class CheckinDialog {
     private JDialog createDialog(Window owner) {
         var dialog = new JDialog(owner);
         dialog.setTitle("Personal information form");
-        dialog.setSize(1000, 500);
+        dialog.setSize(600, 500);
         dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         return dialog;
     }
 
     private JPanel createSingleForm(int number) {
- 
+
         JPanel form = new JPanel();
         GridBagLayout layoutManager = new GridBagLayout();
         form.setLayout(layoutManager);
@@ -115,7 +115,7 @@ final class CheckinDialog {
         firstNameTextField.setEditable(true);
         form.add(firstNameTextField, constraints);
 
-        JTextField lastNameTextField = new JTextField(10);
+        JTextField lastNameTextField = new JTextField(14);
         lastNameTextField.setEditable(true);
         form.add(lastNameTextField, constraints);
         constraints.gridy++;
@@ -123,9 +123,8 @@ final class CheckinDialog {
         JLabel dateOfBirthLabel = new JLabel("Date of birth:");
         form.add(dateOfBirthLabel, constraints);
 
-        JTextField dateOfBirthTextField = new JTextField(10);
-        dateOfBirthTextField.setEditable(true);
-        form.add(dateOfBirthTextField, constraints);
+        DatePicker dateOfBirthPicker = new DatePicker();
+        form.add(dateOfBirthPicker, constraints);
         constraints.gridy++;
 
         JLabel idCardLabel = new JLabel("Identity card number:");
