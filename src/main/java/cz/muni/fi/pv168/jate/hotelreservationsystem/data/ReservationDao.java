@@ -6,42 +6,44 @@ import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Reservation;
 import javax.sql.DataSource;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class ReservationDao {
     private final DataSource dataSource;
+    private final PersonDao personDao;
 
-    public ReservationDao(DataSource dataSource) {
+    public ReservationDao(DataSource dataSource, PersonDao personDao) {
         this.dataSource = dataSource;
+        this.personDao = personDao;
         initTable();
     }
 
     public void create(Reservation reservation) {
         if (reservation.getId() != null) {
-            throw new IllegalArgumentException("Person already has ID: " + person);
+            throw new IllegalArgumentException("Reservation already has ID: " + reservation);
         }
         try (var connection = dataSource.getConnection();
              var st = connection.prepareStatement(
-                     "INSERT INTO PERSON (FIRST_NAME, LAST_NAME, BIRTH_DATE, EVIDEDNCEID, EMAIL, PHONE_NUMBER) VALUES (?, ?, ?, ?, ?, ?)",
+                     "INSERT INTO RESERVATION (OWNERID, ROOMID, CHECKIN, CHECKOUT) VALUES (?, ?, ?, ?)",
                      RETURN_GENERATED_KEYS)) {
-            st.setString(1, person.getFirstName());
-            st.setString(2, person.getLastName());
-            st.setDate(3, Date.valueOf(person.getBirthDate()));
-            st.setString(4, person.getEvidenceID());
-            st.setString(5, person.getEmail());
-            st.setString(6, person.getPhoneNumber());
+            st.setLong(1, reservation.getOwner().getId());
+            st.setLong(2, reservation.getRoom().getId());
+            st.setDate(3, Date.valueOf(reservation.getCheckinDate()));
+            st.setDate(4, Date.valueOf(reservation.getCheckoutDate()));
 
             st.executeUpdate();
             try (var rs = st.getGeneratedKeys()) {
                 if (rs.next()) {
-                    person.setId(rs.getLong(1));
+                    reservation.setId(rs.getLong(1));
                 } else {
-                    throw new DataAccessException("Failed to fetch generated key: no key returned for person: " + person);
+                    throw new DataAccessException("Failed to fetch generated key: no key returned for reservation: " + reservation);
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("Failed to store person" + person, ex);
+            throw new DataAccessException("Failed to store reservation" + reservation, ex);
         }
     }
 
@@ -73,6 +75,30 @@ public class ReservationDao {
                     ")");
         } catch (SQLException ex) {
             throw new DataAccessException("Failed to create RESERVATION table", ex);
+        }
+    }
+
+    public List<Reservation> findAll() {
+        try (var connection = dataSource.getConnection();
+             var st = connection.prepareStatement("SELECT ID, OWNERID, ROOMID, CHECKIN, CHECKOUT FROM RESERVATION")) {
+
+            List<Reservation> reservations = new ArrayList<>();
+            try (var rs = st.executeQuery()) {
+                while (rs.next()) {
+                    Reservation reservation = new Reservation(
+                            personDao.findByID(rs.getLong("OWNERID")),
+                            rs.getString("LAST_NAME"),
+                            rs.getDate("BIRTH_DATE").toLocalDate(),
+                            rs.getString("EVIDENCE"));
+                    person.setEmail(rs.getString("EMAIL"));
+                    person.setPhoneNumber(rs.getString("PHONE_NUMBER"));
+                    person.setId(rs.getLong("ID"));
+                    persons.add(person);
+                }
+            }
+            return persons;
+        } catch (SQLException ex) {
+            throw new DataAccessException("Failed to load all persons", ex);
         }
     }
 
