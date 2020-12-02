@@ -48,12 +48,12 @@ public class PersonDao {
     }
 
     private void initTable() {
-        if (!tableExits("PERSON")) {
+        if (!tableExists("PERSON")) {
             createTable();
         }
     }
 
-    private boolean tableExits( String tableName) {
+    private boolean tableExists(String tableName) {
         try (var connection = dataSource.getConnection();
              var rs = connection.getMetaData().getTables(null, null, tableName, null)) {
             return rs.next();
@@ -87,12 +87,36 @@ public class PersonDao {
             throw new DataAccessException("Failed to load all persons", ex);
         }
     }
+    // returns null if person not in database
+    public Person findByID(Long ID) {
+        try (var connection = dataSource.getConnection();
+             var st = connection.prepareStatement("SELECT ID, FIRST_NAME, LAST_NAME, BIRTH_DATE," +
+                     " EVIDENCE, EMAIL, PHONE_NUMBER FROM PERSON WHERE ID = ?")) {
+            st.setLong(1, ID);
+            try (var rs = st.executeQuery()) {
+                Person person = null;
+                while (rs.next()) {
+                    person = new Person(
+                            rs.getString("FIRST_NAME"),
+                            rs.getString("LAST_NAME"),
+                            rs.getDate("BIRTH_DATE").toLocalDate(),
+                            rs.getString("EVIDENCE"));
+                    person.setEmail(rs.getString("EMAIL"));
+                    person.setPhoneNumber(rs.getString("PHONE_NUMBER"));
+                    person.setId(rs.getLong("ID"));
+                }
+                return person;
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Failed to find person by ID", ex);
+        }
+    }
 
     private void createTable() {
         try (var connection = dataSource.getConnection();
              var st = connection.createStatement()) {
 
-            st.executeUpdate("CREATE TABLE HRS.PERSON (" +
+            st.executeUpdate("CREATE TABLE PERSON (" +
                     "ID BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +
                     "FIRST_NAME VARCHAR(100) NOT NULL," +
                     "LAST_NAME VARCHAR(100) NOT NULL," +
