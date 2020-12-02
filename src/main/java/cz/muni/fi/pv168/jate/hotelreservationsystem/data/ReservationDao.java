@@ -89,7 +89,7 @@ public class ReservationDao {
                     Reservation reservation = new Reservation(
                             personDao.findByID(rs.getLong("OWNER_ID")),
                             new Room(rs.getLong("ROOM_ID"),
-                                    RoomType.GetType(rs.getLong("ROOM_ID"))),
+                                    RoomType.getType(rs.getLong("ROOM_ID"))),
                             rs.getDate("CHECKIN").toLocalDate(),
                             rs.getDate("CHECKOUT").toLocalDate());
                     reservation.setId(rs.getLong("ID"));

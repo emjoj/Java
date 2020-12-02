@@ -5,7 +5,7 @@ public enum RoomType {
     MEDIUM,
     BIG;
 
-    public static RoomType GetType(Long id) {
+    public static RoomType getType(Long id) {
         if (id == null ) {
             throw new IllegalArgumentException("Room ID cannot be null");
         }
