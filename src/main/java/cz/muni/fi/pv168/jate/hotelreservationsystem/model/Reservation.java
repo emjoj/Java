@@ -34,6 +34,17 @@ public class Reservation {
         this.checkoutDate = checkoutDate;
     }
 
+    @Override
+    public String toString() {
+        return "Reservation{" +
+                " owner=" + owner +
+                ", room=" + room +
+                ", checkinDate=" + checkinDate +
+                ", checkoutDate=" + checkoutDate +
+                ", id=" + id +
+                '}';
+    }
+
     public Long getId() {
         return id;
     }
