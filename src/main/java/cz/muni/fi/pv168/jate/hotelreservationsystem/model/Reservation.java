@@ -1,6 +1,7 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.model;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Reservation {
     private Long id;
@@ -8,6 +9,23 @@ public class Reservation {
     private Room room;
     private LocalDate checkinDate;
     private LocalDate checkoutDate;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Reservation that = (Reservation) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(owner, that.owner) &&
+                Objects.equals(room, that.room) &&
+                Objects.equals(checkinDate, that.checkinDate) &&
+                Objects.equals(checkoutDate, that.checkoutDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, owner, room, checkinDate, checkoutDate);
+    }
 
     public Reservation(Person owner, Room room, LocalDate checkinDate, LocalDate checkoutDate) {
         this.owner = owner;
