@@ -1,18 +1,27 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.*;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+/*
+    TODO remove room type after selection...
+    TODO add room type after different selection...
+    TODO add room type after removing...
+    TODO initial value of JComboBox ? NULL
+ */
 
 final class ValidReservationBlock {
 
     private final JPanel panel;
+
+    private List<String> data = new ArrayList<>(Arrays.asList("1-bed room", "2-bed room", "3-bed room"));
 
     ValidReservationBlock() {
         panel = new JPanel();
@@ -24,7 +33,9 @@ final class ValidReservationBlock {
         JButton addRoomTypeButton = new JButton("Add room type");
         addRoomTypeButton.addActionListener(handleRoomTypeAddition(addRoomTypeButton));
 
-        panel.add(addRoomTypeButton);
+        if (!data.isEmpty()) {
+            panel.add(addRoomTypeButton);
+        }
     }
 
     public JPanel getPanel() {
@@ -37,8 +48,27 @@ final class ValidReservationBlock {
 
             JPanel currentPanel = new JPanel();
 
-            JComboBox<String> roomTypeComboBox = new JComboBox<>(new String[]{"1-bed room type", "2-bed room type"});
+            JComboBox<String> roomTypeComboBox = new JComboBox<>();
+            if (data.size() == 1) {
+                roomTypeComboBox.addItem(data.get(0));
+                roomTypeComboBox.setSelectedItem(data.get(0));
+                roomTypeComboBox.setEnabled(false); // TODO ...
+            } else {
+                for (String str : data) {
+                    roomTypeComboBox.addItem(str);
+                }
+                roomTypeComboBox.setSelectedItem(null);
+            }
             roomTypeComboBox.setPreferredSize(new Dimension(150, 30));
+            roomTypeComboBox.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JComboBox s = (JComboBox) e.getSource();
+                    String selected = (String) s.getSelectedItem();
+                    data.remove(selected);
+                    roomTypeComboBox.setEnabled(false); // TODO ...
+                }
+            });
             currentPanel.add(roomTypeComboBox);
 
             JSpinner roomCountSpinner = new JSpinner(new SpinnerNumberModel(0, 0, null, 1));
@@ -46,11 +76,14 @@ final class ValidReservationBlock {
             currentPanel.add(roomCountSpinner);
 
             JButton removeButton = new JButton("X");
+            removeButton.setPreferredSize(new Dimension(45, 30));
             removeButton.addActionListener(removeRoomType(currentPanel));
             currentPanel.add(removeButton);
 
             panel.add(currentPanel);
-            panel.add(addRoomTypeButton);
+            if (data.size() > 1) { // TODO max size... FIX
+                panel.add(addRoomTypeButton);
+            }
             panel.revalidate();
         };
     }

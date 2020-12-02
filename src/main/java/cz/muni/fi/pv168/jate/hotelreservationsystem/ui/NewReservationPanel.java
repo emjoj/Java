@@ -6,6 +6,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.*;
+import java.time.LocalDate;
 
 final class NewReservationPanel {
 
@@ -20,9 +21,6 @@ final class NewReservationPanel {
         gbc.insets = new Insets(15, 15, 15, 15);
 
         gbc.gridy = 0;
-        panel.add(new JLabel("New reservation"), gbc);
-
-        gbc.gridy++;
         panel.add(createDatePickers(), gbc);
 
         gbc.gridy++;
@@ -42,7 +40,7 @@ final class NewReservationPanel {
     private JPanel createDatePickers() {
         JPanel datePickerPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(0, 15, 0, 15);
+        gbc.insets = new Insets(0, 3, 0, 3);
 
         datePickerPanel.add(createDatePickerField("Check-in date"), gbc);
         datePickerPanel.add(createDatePickerField("Check-out date"), gbc);
@@ -52,12 +50,16 @@ final class NewReservationPanel {
 
     private JPanel createDatePickerField(String label) {
         JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridy = 0;
+        panel.add(new JLabel(label + ":"), gbc);
 
-        panel.add(new Label(label + ":"), BorderLayout.NORTH);
-
-        DatePicker datePicker = new DatePicker();
-        panel.add(datePicker, BorderLayout.SOUTH);
+        DatePicker datePicker = new DatePicker(LocalDate.now(), null);
+        gbc.gridy++;
+        gbc.ipady = 5;
+        panel.add(datePicker, gbc);
 
         return panel;
     }
