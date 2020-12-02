@@ -1,6 +1,5 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.data;
 
-import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Person;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Reservation;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Room;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomType;
@@ -29,7 +28,7 @@ public class ReservationDao {
         }
         try (var connection = dataSource.getConnection();
              var st = connection.prepareStatement(
-                     "INSERT INTO RESERVATION (OWNERID, ROOMID, CHECKIN, CHECKOUT) VALUES (?, ?, ?, ?)",
+                     "INSERT INTO RESERVATION (OWNER_ID, ROOM_ID, CHECKIN, CHECKOUT) VALUES (?, ?, ?, ?)",
                      RETURN_GENERATED_KEYS)) {
             st.setLong(1, reservation.getOwner().getId());
             st.setLong(2, reservation.getRoom().getId());
@@ -70,8 +69,8 @@ public class ReservationDao {
 
             st.executeUpdate("CREATE TABLE RESERVATION (" +
                     "ID BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +
-                    "OWNERID BIGINT NOT NULL REFERENCES PERSON(ID)," +
-                    "ROOMID BIGINT NOT NULL," +
+                    "OWNER_ID BIGINT NOT NULL REFERENCES PERSON(ID)," +
+                    "ROOM_ID BIGINT NOT NULL," +
                     "CHECKIN DATE NOT NULL," +
                     "CHECKOUT DATE NOT NULL" +
                     ")");
@@ -82,15 +81,15 @@ public class ReservationDao {
 
     public List<Reservation> findAll() {
         try (var connection = dataSource.getConnection();
-             var st = connection.prepareStatement("SELECT ID, OWNERID, ROOMID, CHECKIN, CHECKOUT FROM RESERVATION")) {
+             var st = connection.prepareStatement("SELECT ID, OWNER_ID, ROOM_ID, CHECKIN, CHECKOUT FROM RESERVATION")) {
 
             List<Reservation> reservations = new ArrayList<>();
             try (var rs = st.executeQuery()) {
                 while (rs.next()) {
                     Reservation reservation = new Reservation(
-                            personDao.findByID(rs.getLong("OWNERID")),
-                            new Room(rs.getLong("ROOMID"),
-                                    RoomType.GetType(rs.getLong("ROOMID"))),
+                            personDao.findByID(rs.getLong("OWNER_ID")),
+                            new Room(rs.getLong("ROOM_ID"),
+                                    RoomType.GetType(rs.getLong("ROOM_ID"))),
                             rs.getDate("CHECKIN").toLocalDate(),
                             rs.getDate("CHECKOUT").toLocalDate());
                     reservation.setId(rs.getLong("ID"));
