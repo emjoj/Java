@@ -37,7 +37,8 @@ final class PersonDaoTest {
                 LocalDate.of(1998,1, 20), "123456789kek");
         personDao.create(tomik);
 
-        assertThat(tomik.getId()).isNotNull();
+        assertThat(tomik.getId())
+                .isNotNull();
         assertThat(personDao.findAll()).containsExactly(tomik);
     }
 
