@@ -2,6 +2,8 @@ package cz.muni.fi.pv168.jate.hotelreservationsystem.data;
 
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Person;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Reservation;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Room;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomType;
 
 import javax.sql.DataSource;
 import java.sql.Date;
@@ -87,16 +89,15 @@ public class ReservationDao {
                 while (rs.next()) {
                     Reservation reservation = new Reservation(
                             personDao.findByID(rs.getLong("OWNERID")),
-                            rs.getString("LAST_NAME"),
-                            rs.getDate("BIRTH_DATE").toLocalDate(),
-                            rs.getString("EVIDENCE"));
-                    person.setEmail(rs.getString("EMAIL"));
-                    person.setPhoneNumber(rs.getString("PHONE_NUMBER"));
-                    person.setId(rs.getLong("ID"));
-                    persons.add(person);
+                            new Room(rs.getLong("ROOMID"),
+                                    RoomType.GetType(rs.getLong("ROOMID"))),
+                            rs.getDate("CHECKIN").toLocalDate(),
+                            rs.getDate("CHECKOUT").toLocalDate());
+                    reservation.setId(rs.getLong("ID"));
+                    reservations.add(reservation);
                 }
             }
-            return persons;
+            return reservations;
         } catch (SQLException ex) {
             throw new DataAccessException("Failed to load all persons", ex);
         }
