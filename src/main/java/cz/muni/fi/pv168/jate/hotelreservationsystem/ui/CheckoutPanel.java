@@ -1,32 +1,62 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeListener;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionListener;
-import java.util.Objects;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Person;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Reservation;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Room;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomType;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 final class CheckoutPanel {
 
+    JTextField firstNameText;
+    JTextField lastNameText;
+    JTextField roomText;
+    JTextField priceText;
+    JTextField nightsText;
+
     private final GridBagConstraints gbc = new GridBagConstraints();
     private final JPanel panel = new JPanel();
-    private JComboBox<String> roomTypes;
     private final JLabel totalCost = new JLabel("0");
+    private Dashboard owner;
+    /*
+    private JComboBox<String> roomTypes;
     private int sumPerNight;
     private JSpinner nights;
 
-    CheckoutPanel() {
+     */
+    //private ReservationDao reservationDao = new ReservationDao();
+    Reservation checkoutRoom;
+    Reservation reservation1 = new Reservation(new Person("Alan","Holly",LocalDate.of(1997, 1, 13),"HU9876"),
+            new Room((long) 1, RoomType.SMALL), LocalDate.of(2017, 1, 13),LocalDate.of(2017, 1, 15));
+
+    Reservation reservation2 = new Reservation(new Person("Erik","Cooper",LocalDate.of(1999, 1, 13),"876JOI"),
+            new Room((long) 3, RoomType.SMALL), LocalDate.of(2017, 1, 13),LocalDate.of(2017, 1, 25));
+
+    ArrayList<Reservation> reservations = new ArrayList<>();
+
+    private void createReservationsList(){
+        reservations.add(reservation2);
+        reservations.add(reservation1);
+    }
+
+
+
+    CheckoutPanel(Dashboard owner) {
+        this.owner = owner;
+        createReservationsList();
         panel.setLayout(new GridBagLayout());
         panel.setName("Check-out");
-        addRoomNumber();
+        addRoomNumberTitle();
 
         addTitle("Guest Information");
         addGuestInformation();
@@ -34,23 +64,106 @@ final class CheckoutPanel {
         addRoomInformation();
         addTitle("Payment Information");
         addFinalSum();
-        addButton();
+        addCheckoutButton();
     }
 
     public JPanel getPanel() {
         return panel;
     }
 
-    private void addRoomNumber() {
+    private void addRoomNumberTitle() {
         gbc.anchor = GridBagConstraints.FIRST_LINE_START;
         addLabel("Room number:");
 
         gbc.gridx = 1;
-        JTextField roomNumber = new JTextField(15);
-        panel.add(roomNumber, gbc);
+        createListOfRooms();
     }
 
+    private void createListOfRooms(){
+        List<Long> data = new ArrayList<>();
 
+        for(int i=1; i <=20;i ++){
+            data.add((long)i);
+        }
+
+        JList list = new JList(data.toArray());
+
+        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        list.setLayoutOrientation(JList.VERTICAL_WRAP);
+        list.setVisibleRowCount(4);
+        list.setFixedCellHeight(20);
+        list.setFixedCellWidth(30);
+        JScrollPane listScroller = new JScrollPane(list);
+        listScroller.setPreferredSize(new Dimension(250, 80));
+        panel.add(new JScrollPane(list),gbc);
+        System.out.println(list.getSelectedValue());
+        loadData(list);
+        //setEnabled(false);
+    }
+    /*
+    private void disableEmptyRooms(JList list) {
+        for (int i = 0; i < reservations.size(); i ++) {
+            if (reservations.get(i);
+                list.setSelectedIndex(i);
+
+
+            }
+        }
+    }
+
+     */
+
+    private void loadRoomNumber(Object selectedRoomNumber){
+        for (Reservation reservation : reservations) {
+            if (reservation.getRoom().getId().equals((selectedRoomNumber))) {
+                checkoutRoom = reservation;
+            }
+        }
+
+
+    }
+    private void loadData(JList list){
+
+
+        list.addListSelectionListener(
+                new ListSelectionListener() {
+                    @Override
+                    public void valueChanged(ListSelectionEvent e) {
+                        loadRoomNumber(list.getSelectedValue());
+                        System.out.println(list.getSelectedValue());
+
+
+
+                        long nights = DAYS.between(checkoutRoom.getCheckinDate(), checkoutRoom.getCheckoutDate());
+                        long pricePerNight = setPrice(checkoutRoom.getRoom().getRoomType());
+
+
+                        firstNameText.setText(checkoutRoom.getOwner().getFirstName());
+                        lastNameText.setText(checkoutRoom.getOwner().getLastName());
+                        roomText.setText(checkoutRoom.getRoom().getRoomType().toString());
+                        priceText.setText(String.valueOf(pricePerNight));
+                        nightsText.setText(String.valueOf(nights)) ;
+                        totalCost.setText(String.valueOf(pricePerNight*nights));
+                    }
+                }
+        );
+
+    }
+    private long setPrice(RoomType roomType) {
+        switch (roomType) {
+            case SMALL:
+                return 50;
+
+            case MEDIUM:
+                return 100;
+
+            case BIG:
+                return 150;
+
+            default: return 0;
+        }
+
+    }
 
     private void addTitle(String title) {
         gbc.gridx--;
@@ -65,6 +178,14 @@ final class CheckoutPanel {
         gbc.anchor = GridBagConstraints.FIRST_LINE_START;
     }
 
+    private void setTextFieldFormat(JTextField textField){
+        textField.setEnabled(false);
+        textField.setHorizontalAlignment(JTextField.CENTER);
+        textField.setDisabledTextColor(Color.BLACK);
+        panel.add(textField, gbc);
+
+    }
+
     private void addGuestInformation() {
         addLabel("First Name:");
         addLabel("Last Name:");
@@ -73,14 +194,12 @@ final class CheckoutPanel {
         gbc.gridy = 2;
         gbc.ipady = 1;
 
-        JTextField firstNameText = new JTextField(15);
-        firstNameText.setEnabled(false);
-        panel.add(firstNameText, gbc);
+        firstNameText = new JTextField(15);
+        setTextFieldFormat(firstNameText);
 
         gbc.gridy++;
-        JTextField lastNameText = new JTextField(15);
-        lastNameText.setEnabled(false);
-        panel.add(lastNameText, gbc);
+        lastNameText = new JTextField(15);
+        setTextFieldFormat(lastNameText);
     }
 
     private void addRoomInformation() {
@@ -92,12 +211,14 @@ final class CheckoutPanel {
         gbc.gridy = 5;
         gbc.ipady = 1;
 
-        addRoomType();
+        roomText = new JTextField(15);
+        setTextFieldFormat(roomText);
         gbc.gridy++;
-        JTextField priceText = new JTextField(15);
-        priceText.setEnabled(false);
-        panel.add(priceText, gbc);
-        addNights();
+        priceText = new JTextField(15);
+        setTextFieldFormat(priceText);
+        gbc.gridy++;
+        nightsText = new JTextField(15);
+        setTextFieldFormat(nightsText);
     }
 
     private void addFinalSum() {
@@ -109,7 +230,7 @@ final class CheckoutPanel {
         panel.add(totalCost, gbc);
     }
 
-    private void addButton() {
+    private void addCheckoutButton() {
         gbc.gridx--;
         gbc.gridy++;
         gbc.gridwidth = 2;
@@ -121,23 +242,16 @@ final class CheckoutPanel {
         panel.add(checkOut, gbc);
     }
 
-    private void addRoomType() {
-        String[] roomTypeStrings = {"1-bed room", "2-bed room", "3-bed room"};
-        roomTypes = new JComboBox<>(roomTypeStrings);
-        roomTypes.addActionListener(handleRoomTypeChange());
-        panel.add(roomTypes, gbc);
+    private void addLabel(String s) {
+        panel.add(new JLabel(s), gbc);
+        gbc.gridy++;
     }
-
+/*
     private void addNights() {
         gbc.gridy++;
         nights = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
         nights.addChangeListener(handleNightCountChange());
         panel.add(nights, gbc);
-    }
-
-    private void addLabel(String s) {
-        panel.add(new JLabel(s), gbc);
-        gbc.gridy++;
     }
 
     public ActionListener handleRoomTypeChange() {
@@ -163,5 +277,10 @@ final class CheckoutPanel {
             int cost = (Integer) nights.getValue() * sumPerNight;
             totalCost.setText(Integer.toString(cost));
         };
+
     }
+
+     */
+
+
 }
