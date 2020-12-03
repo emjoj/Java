@@ -30,7 +30,7 @@ final class ReservationDaoTest {
     @BeforeEach
     void createReservationDao() {
         personDao = new PersonDao(dataSource);
-        reservationDao = new ReservationDao(dataSource, personDao);
+        reservationDao = new ReservationDao(dataSource);
     }
 
     @Test

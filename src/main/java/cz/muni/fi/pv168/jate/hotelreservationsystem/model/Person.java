@@ -32,6 +32,16 @@ public class Person {
     private String phoneNumber;
     private String email;
 
+    public Person(Long id, String firstName, String lastName, LocalDate birthDate, String evidenceID, String phoneNumber, String email) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.birthDate = birthDate;
+        this.evidenceID = evidenceID;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+    }
+
     public Person(String firstName, String lastName, LocalDate birthDate, String evidenceID) {
         this.firstName = firstName;
         this.lastName = lastName;

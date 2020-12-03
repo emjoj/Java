@@ -1,5 +1,6 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.data;
 
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Person;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Reservation;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Room;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomType;
@@ -14,11 +15,9 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class ReservationDao {
     private final DataSource dataSource;
-    private final PersonDao personDao;
 
-    public ReservationDao(DataSource dataSource, PersonDao personDao) {
+    public ReservationDao(DataSource dataSource) {
         this.dataSource = dataSource;
-        this.personDao = personDao;
         initTable();
     }
 
@@ -84,13 +83,23 @@ public class ReservationDao {
 
     public List<Reservation> findAll() {
         try (var connection = dataSource.getConnection();
-             var st = connection.prepareStatement("SELECT ID, OWNER_ID, ROOM_ID, CHECKIN, CHECKOUT FROM RESERVATION")) {
+             var st = connection.prepareStatement("SELECT R.ID, OWNER_ID, ROOM_ID, CHECKIN, CHECKOUT," +
+                     " FIRST_NAME, LAST_NAME, BIRTH_DATE," +
+                     " EVIDENCE, EMAIL, PHONE_NUMBER" +
+                     " FROM RESERVATION AS R INNER JOIN PERSON AS P" +
+                     " ON OWNER_ID = P.ID")) {
 
             List<Reservation> reservations = new ArrayList<>();
             try (var rs = st.executeQuery()) {
                 while (rs.next()) {
                     Reservation reservation = new Reservation(
-                            personDao.findByID(rs.getLong("OWNER_ID")),
+                            new Person(rs.getLong("OWNER_ID"),
+                                    rs.getString("FIRST_NAME"),
+                                    rs.getString("LAST_NAME"),
+                                    rs.getDate("BIRTH_DATE").toLocalDate(),
+                                    rs.getString("EVIDENCE"),
+                                    rs.getString("EMAIL"),
+                                    rs.getString("PHONE_NUMBER")),
                             new Room(rs.getLong("ROOM_ID"),
                                     RoomType.getType(rs.getLong("ROOM_ID"))),
                             rs.getDate("CHECKIN").toLocalDate(),
@@ -101,7 +110,7 @@ public class ReservationDao {
             }
             return reservations;
         } catch (SQLException ex) {
-            throw new DataAccessException("Failed to load all persons", ex);
+            throw new DataAccessException("Failed to load all reservations", ex);
         }
     }
 
