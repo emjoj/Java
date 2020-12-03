@@ -61,6 +61,7 @@ final class CheckinPanel {
         panel.add(new JLabel("evidence ID: "), constraints);
         evidenceIdTextField.setEditable(false);
         panel.add(evidenceIdTextField, constraints);
+        evidenceIdTextField.addCaretListener(e -> evidenceIdTextField.setEditable(withReservationCheckBox.isSelected()));
         withReservationCheckBox.addActionListener(e -> evidenceIdTextField.setEditable(withReservationCheckBox.isSelected()));
         constraints.gridy++;
 
