@@ -15,7 +15,7 @@ import static java.awt.GridBagConstraints.HORIZONTAL;
 final class CheckinPanel {
 
     private final JPanel panel;
-    private final Window owner;
+    private final Dashboard owner;
 
     private final JCheckBox withReservationCheckBox = new JCheckBox();
     private final JTextField evidenceIdTextField = new JTextField(5);
@@ -26,7 +26,7 @@ final class CheckinPanel {
     private final JTextField numberOfPeopleTextField = new JTextField(5);
     private final JButton fillPersonalInfoButton = new JButton("Fill in personal information");
 
-    CheckinPanel(Window owner) {
+    CheckinPanel(Dashboard owner) {
         this.owner = owner;
         panel = createCheckinPanel();
     }
@@ -95,7 +95,7 @@ final class CheckinPanel {
         constraints.fill = CENTER;
         fillPersonalInfoButton.setEnabled(false);
         fillPersonalInfoButton.addActionListener(e ->
-                new CheckinDialog(owner, Integer.parseInt(numberOfPeopleTextField.getText())));
+                new CheckinDialog(owner.getFrame(), Integer.parseInt(numberOfPeopleTextField.getText())));
         panel.add(fillPersonalInfoButton, constraints);
     }
 

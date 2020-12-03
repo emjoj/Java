@@ -1,98 +1,129 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
-import javax.swing.*;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomType;
 
-/*
-    TODO remove room type after selection...
-    TODO add room type after different selection...
-    TODO add room type after removing...
-    TODO initial value of JComboBox ? NULL
- */
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
 
 final class ValidReservationBlock {
 
     private final JPanel panel;
-
-    private List<String> data = new ArrayList<>(Arrays.asList("1-bed room", "2-bed room", "3-bed room"));
+    private JCheckBox smallCheckBox = new JCheckBox(RoomType.SMALL.name());
+    private JCheckBox mediumCheckBox = new JCheckBox(RoomType.MEDIUM.name());
+    private JCheckBox bigCheckBox = new JCheckBox(RoomType.BIG.name());
+    private JLabel smallLabel = new JLabel("max 0");
+    private JLabel mediumLabel = new JLabel("max 0");
+    private JLabel bigLabel = new JLabel("max 0");
+    private JSpinner smallSpinner = new JSpinner(new SpinnerNumberModel(0, 0, null, 1));
+    private JSpinner mediumSpinner = new JSpinner(new SpinnerNumberModel(0, 0, null, 1));
+    private JSpinner bigSpinner = new JSpinner(new SpinnerNumberModel(0, 0, null, 1));
 
     ValidReservationBlock() {
-        panel = new JPanel();
-        panel.setPreferredSize(new Dimension(300, 250));
+        panel = new JPanel(new GridBagLayout());
+        initValidReservationBlock();
+    }
 
+    private void initValidReservationBlock() {
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(0, 0, 10, 0);
+        gbc.insets = new Insets(0, 5, 10, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JButton addRoomTypeButton = new JButton("Add room type");
-        addRoomTypeButton.addActionListener(handleRoomTypeAddition(addRoomTypeButton));
+        gbc.gridy = -1;
 
-        if (!data.isEmpty()) {
-            panel.add(addRoomTypeButton);
-        }
+        initRoomTypeLine(smallCheckBox, smallLabel, smallSpinner, gbc);
+        initRoomTypeLine(mediumCheckBox, mediumLabel, mediumSpinner, gbc);
+        initRoomTypeLine(bigCheckBox, bigLabel, bigSpinner, gbc);
+    }
+
+    private void initRoomTypeLine(JCheckBox checkBox, JLabel label, JSpinner spinner, GridBagConstraints gbc) {
+        gbc.gridy++;
+
+        spinner.setEnabled(false);
+
+        checkBox.setEnabled(false);
+        checkBox.addActionListener(e -> spinner.setEnabled(checkBox.isSelected()));
+        panel.add(checkBox, gbc);
+
+        gbc.insets = new Insets(0, 100, 10, 5);
+        panel.add(label, gbc);
+
+        gbc.insets = new Insets(0, 5, 10, 5);
+        spinner.setPreferredSize(new Dimension(60, 30));
+        panel.add(spinner, gbc);
     }
 
     public JPanel getPanel() {
         return panel;
     }
 
-    private ActionListener handleRoomTypeAddition(JButton addRoomTypeButton) {
-        return e -> {
-            panel.remove(addRoomTypeButton);
+    void updateRoomTypeLines(List<Long> roomNumbers) {
+        int small = 0;
+        int medium = 0;
+        int big = 0;
 
-            JPanel currentPanel = new JPanel();
-
-            JComboBox<String> roomTypeComboBox = new JComboBox<>();
-            if (data.size() == 1) {
-                roomTypeComboBox.addItem(data.get(0));
-                roomTypeComboBox.setSelectedItem(data.get(0));
-                roomTypeComboBox.setEnabled(false); // TODO ...
-            } else {
-                for (String str : data) {
-                    roomTypeComboBox.addItem(str);
-                }
-                roomTypeComboBox.setSelectedItem(null);
+        for (Long number : roomNumbers) {
+            if (number < 8) {
+                small++;
+                smallCheckBox.setEnabled(true);
+            } else if (number < 15) {
+                medium++;
+                mediumCheckBox.setEnabled(true);
+            } else if (number <= 20) {
+                big++;
+                bigCheckBox.setEnabled(true);
             }
-            roomTypeComboBox.setPreferredSize(new Dimension(150, 30));
-            roomTypeComboBox.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JComboBox s = (JComboBox) e.getSource();
-                    String selected = (String) s.getSelectedItem();
-                    data.remove(selected);
-                    roomTypeComboBox.setEnabled(false); // TODO ...
-                }
-            });
-            currentPanel.add(roomTypeComboBox);
+        }
 
-            JSpinner roomCountSpinner = new JSpinner(new SpinnerNumberModel(0, 0, null, 1));
-            roomCountSpinner.setPreferredSize(new Dimension(60, 30));
-            currentPanel.add(roomCountSpinner);
+        String[] splitSmall = smallLabel.getText().split(" ");
+        String smallText = splitSmall[0] + " " + small;
+        smallLabel.setText(smallText);
+        smallSpinner.setModel(new SpinnerNumberModel(0, 0, small, 1));
 
-            JButton removeButton = new JButton("X");
-            removeButton.setPreferredSize(new Dimension(45, 30));
-            removeButton.addActionListener(removeRoomType(currentPanel));
-            currentPanel.add(removeButton);
+        String[] splitMedium = mediumLabel.getText().split(" ");
+        String mediumText = splitMedium[0] + " " + medium;
+        mediumLabel.setText(mediumText);
+        mediumSpinner.setModel(new SpinnerNumberModel(0, 0, medium, 1));
 
-            panel.add(currentPanel);
-            if (data.size() > 1) { // TODO max size... FIX
-                panel.add(addRoomTypeButton);
-            }
-            panel.revalidate();
-        };
+        String[] splitBig = bigLabel.getText().split(" ");
+        String bigText = splitBig[0] + " " + big;
+        bigLabel.setText(bigText);
+        bigSpinner.setModel(new SpinnerNumberModel(0, 0, big, 1));
     }
 
-    private ActionListener removeRoomType(JPanel currentPanel) {
-        return e -> {
-            panel.remove(currentPanel);
-            panel.revalidate();
-            panel.repaint();
-        };
+    public JCheckBox getSmallCheckBox() {
+        return smallCheckBox;
+    }
+
+    public JCheckBox getMediumCheckBox() {
+        return mediumCheckBox;
+    }
+
+    public JCheckBox getBigCheckBox() {
+        return bigCheckBox;
+    }
+
+    public JLabel getSmallLabel() {
+        return smallLabel;
+    }
+
+    public JLabel getMediumLabel() {
+        return mediumLabel;
+    }
+
+    public JLabel getBigLabel() {
+        return bigLabel;
+    }
+
+    public JSpinner getSmallSpinner() {
+        return smallSpinner;
+    }
+
+    public JSpinner getMediumSpinner() {
+        return mediumSpinner;
+    }
+
+    public JSpinner getBigSpinner() {
+        return bigSpinner;
     }
 }
