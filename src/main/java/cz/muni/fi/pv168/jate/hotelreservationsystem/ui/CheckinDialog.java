@@ -3,10 +3,12 @@ package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
 import com.github.lgooddatepicker.components.DatePicker;
 
 import javax.swing.*;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.awt.GridBagConstraints.HORIZONTAL;
 
@@ -29,11 +31,13 @@ final class CheckinDialog {
         dialog.add(popupMenuPanel, BorderLayout.PAGE_START);
         dialog.add(forms, BorderLayout.CENTER);
         dialog.setLocationRelativeTo(null);
+        dialog.setResizable(false);
         dialog.setVisible(true);
     }
 
     private JComboBox createPopupMenu(int numberOfPanels, JPanel popupMenuPanel) {
         JComboBox popupMenu = new JComboBox(createForms(numberOfPanels).toArray());
+        popupMenu.setPreferredSize(new Dimension(100, 20));
         popupMenu.setEditable(false);
         popupMenu.addItemListener(e -> {
             CardLayout cardLayout = (CardLayout) (forms.getLayout());
@@ -69,7 +73,7 @@ final class CheckinDialog {
 
         if (isAlreadyFilled())
             for (Component form : forms.getComponents()) {
-                Component confirmButton = form.getComponentAt(451, 293);
+                Component confirmButton = form.getComponentAt(203, 295);
                 confirmButton.setEnabled(true);
             }
     }
@@ -92,6 +96,7 @@ final class CheckinDialog {
     }
 
     private JPanel createSingleForm(int number) {
+        List<JTextField> textFields = new ArrayList<>();
 
         JPanel form = new JPanel();
         GridBagLayout layoutManager = new GridBagLayout();
@@ -104,33 +109,32 @@ final class CheckinDialog {
         constraints.fill = HORIZONTAL;
 
         constraints.gridy = 1;
-        JLabel personLabel = new JLabel("Person " + number);
-        form.add(personLabel, constraints);
+        form.add(new JLabel("Person " + number), constraints);
         constraints.gridy++;
 
-        JLabel nameLabel = new JLabel("Name:");
-        form.add(nameLabel, constraints);
+        form.add(new JLabel("Name:"), constraints);
 
         JTextField firstNameTextField = new JTextField(10);
+        textFields.add(firstNameTextField);
         firstNameTextField.setEditable(true);
         form.add(firstNameTextField, constraints);
 
         JTextField lastNameTextField = new JTextField(14);
+        textFields.add(lastNameTextField);
         lastNameTextField.setEditable(true);
         form.add(lastNameTextField, constraints);
         constraints.gridy++;
 
-        JLabel dateOfBirthLabel = new JLabel("Date of birth:");
-        form.add(dateOfBirthLabel, constraints);
+        form.add(new JLabel("Date of birth:"), constraints);
 
         DatePicker dateOfBirthPicker = new DatePicker();
         form.add(dateOfBirthPicker, constraints);
         constraints.gridy++;
 
-        JLabel idCardLabel = new JLabel("Identity card number:");
-        form.add(idCardLabel, constraints);
+        form.add(new JLabel("Identity card number:"), constraints);
 
         JTextField idCardTextField = new JTextField(10);
+        textFields.add(idCardTextField);
         idCardTextField.setEditable(true);
         form.add(idCardTextField, constraints);
         constraints.gridy++;
@@ -140,10 +144,30 @@ final class CheckinDialog {
         confirmButton.addActionListener(e -> dialog.dispose());
 
         JButton saveButton = new JButton("Save");
+        saveButton.setEnabled(false);
         saveButton.addActionListener(e -> updateComboBoxItems(firstNameTextField.getText(), number - 1));
         form.add(saveButton, constraints);
         form.add(confirmButton, constraints);
 
+        firstNameTextField.addCaretListener(e -> checkThatTextBoxesAreFilled(textFields, dateOfBirthPicker, saveButton));
+        lastNameTextField.addCaretListener(e -> checkThatTextBoxesAreFilled(textFields, dateOfBirthPicker, saveButton));
+        dateOfBirthPicker.addDateChangeListener(e -> checkThatTextBoxesAreFilled(textFields, dateOfBirthPicker, saveButton));
+        idCardTextField.addCaretListener(e -> checkThatTextBoxesAreFilled(textFields, dateOfBirthPicker, saveButton));
+
         return form;
     }
+
+    private void checkThatTextBoxesAreFilled(List<JTextField> textFields, DatePicker dateOfBirth, JButton saveButton) {
+        List<String> contentOfTextFields = textFields.stream().map(JTextComponent::getText).collect(Collectors.toList());
+        contentOfTextFields.add(dateOfBirth.getText());
+        boolean areFilled = true;
+        for (String textField : contentOfTextFields) {
+            if (textField.isEmpty()) {
+                areFilled = false;
+                break;
+            }
+        }
+        saveButton.setEnabled(areFilled);
+    }
+
 }
