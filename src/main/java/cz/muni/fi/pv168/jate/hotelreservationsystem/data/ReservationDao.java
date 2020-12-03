@@ -26,6 +26,9 @@ public class ReservationDao {
         if (reservation.getId() != null) {
             throw new IllegalArgumentException("Reservation already has ID: " + reservation);
         }
+        if (reservation.getOwner().getId() == null) {
+            throw new IllegalArgumentException("Owner does not have an ID: " + reservation);
+        }
         try (var connection = dataSource.getConnection();
              var st = connection.prepareStatement(
                      "INSERT INTO RESERVATION (OWNER_ID, ROOM_ID, CHECKIN, CHECKOUT) VALUES (?, ?, ?, ?)",

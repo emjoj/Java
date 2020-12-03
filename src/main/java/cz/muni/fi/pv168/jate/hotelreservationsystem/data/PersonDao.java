@@ -25,7 +25,7 @@ public class PersonDao {
         }
         try (var connection = dataSource.getConnection();
              var st = connection.prepareStatement(
-                     "INSERT INTO PERSON (FIRST_NAME, LAST_NAME, BIRTH_DATE, EVIDEDNCEID, EMAIL, PHONE_NUMBER) VALUES (?, ?, ?, ?, ?, ?)",
+                     "INSERT INTO PERSON (FIRST_NAME, LAST_NAME, BIRTH_DATE, EVIDENCE, EMAIL, PHONE_NUMBER) VALUES (?, ?, ?, ?, ?, ?)",
                      RETURN_GENERATED_KEYS)) {
             st.setString(1, person.getFirstName());
             st.setString(2, person.getLastName());
@@ -130,11 +130,11 @@ public class PersonDao {
         }
     }
 
-    private void DropTable() {
+    public void dropTable() {
         try (var connection = dataSource.getConnection();
              var st = connection.createStatement()) {
 
-            st.executeUpdate("DROP TABLE EMPLOYEE");
+            st.executeUpdate("DROP TABLE PERSON");
         } catch (SQLException ex) {
             throw new DataAccessException("Failed to drop PERSON table", ex);
         }
