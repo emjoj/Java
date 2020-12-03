@@ -5,6 +5,7 @@ import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomType;
 
 import javax.swing.*;
 import java.awt.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,17 +17,14 @@ final class CheckinPanel {
     private final JPanel panel;
     private final Window owner;
 
-    private JTextField evidenceIdTextField;
-    private DatePicker checkinDatePicker;
-    private DatePicker checkoutDatePicker;
-    private JTextField roomNumberTextField;
-    private JTextField numberOfPeopleTextField;
-
-    private String evidenceID;
-    private String checkinDate;
-    private String checkoutDate;
-    private String roomNumber;
-    private String numberOfPeople;
+    private final JCheckBox withReservationCheckBox = new JCheckBox();
+    private final JTextField evidenceIdTextField = new JTextField(5);
+    private final DatePicker checkinDatePicker = new DatePicker();
+    private final DatePicker checkoutDatePicker = new DatePicker();
+    private JComboBox roomTypes = new JComboBox(RoomType.values());
+    private final JTextField roomNumberTextField = new JTextField(5);
+    private final JTextField numberOfPeopleTextField = new JTextField(5);
+    private final JButton fillPersonalInfoButton = new JButton("Fill in personal information");
 
     CheckinPanel(Window owner) {
         this.owner = owner;
@@ -56,96 +54,85 @@ final class CheckinPanel {
     }
 
     private void fillCheckinPanel(JPanel panel, GridBagConstraints constraints) {
-        JLabel withReservartion = new JLabel("With prior reservation:");
-        panel.add(withReservartion, constraints);
-        JCheckBox withReservationCheckBox = new JCheckBox();
+        panel.add(new JLabel("With prior reservation:"), constraints);
         panel.add(withReservationCheckBox, constraints);
         constraints.gridy++;
 
-        JLabel evidenceID = new JLabel("evidence ID: ");
-        panel.add(evidenceID, constraints);
-        evidenceIdTextField = new JTextField(5);
+        panel.add(new JLabel("evidence ID: "), constraints);
         evidenceIdTextField.setEditable(false);
         panel.add(evidenceIdTextField, constraints);
         withReservationCheckBox.addActionListener(e -> evidenceIdTextField.setEditable(withReservationCheckBox.isSelected()));
         constraints.gridy++;
 
-        JLabel checkin = new JLabel("Check - in date:");
-        panel.add(checkin, constraints);
-        checkinDatePicker = new DatePicker();
+        panel.add(new JLabel("Check - in date:"), constraints);
+        checkoutDatePicker.addDateChangeListener(e -> fillPersonalInfoButton.setEnabled(checkThatTextBoxesAreFilled()));
         checkinDatePicker.setDateToToday();
         panel.add(checkinDatePicker, constraints);
         constraints.gridy++;
 
-        JLabel checkout = new JLabel("Check - out date:");
-        panel.add(checkout, constraints);
-        checkoutDatePicker = new DatePicker();
+        panel.add(new JLabel("Check - out date:"), constraints);
+        checkoutDatePicker.disableUntil(checkinDatePicker.getDate().plusDays(1));
+        checkoutDatePicker.addDateChangeListener(e -> fillPersonalInfoButton.setEnabled(checkThatTextBoxesAreFilled()));
         panel.add(checkoutDatePicker, constraints);
         constraints.gridy++;
 
-        JLabel roomType = new JLabel("Room type: ");
-        panel.add(roomType, constraints);
-        JComboBox roomTypes = new JComboBox(RoomType.values());
+        panel.add(new JLabel("Room type:"), constraints);
         panel.add(roomTypes, constraints);
         constraints.gridy++;
 
-        JLabel roomNumber = new JLabel("Room number: ");
-        panel.add(roomNumber, constraints);
-        roomNumberTextField = new JTextField(5);
+        panel.add(new JLabel("Room number:"), constraints);
+        roomNumberTextField.addCaretListener(e -> fillPersonalInfoButton.setEnabled(checkThatTextBoxesAreFilled()));
         roomNumberTextField.setText("1");
         roomNumberTextField.setEditable(false);
         panel.add(roomNumberTextField, constraints);
         constraints.gridy++;
 
-        JLabel numberOfPeople = new JLabel("Number of people: ");
-        panel.add(numberOfPeople, constraints);
-        numberOfPeopleTextField = new JTextField(5);
+        panel.add(new JLabel("Number of people:"), constraints);
+        numberOfPeopleTextField.addCaretListener(e -> fillPersonalInfoButton.setEnabled(checkThatTextBoxesAreFilled()));
         panel.add(numberOfPeopleTextField, constraints);
         constraints.gridy++;
 
         constraints.fill = CENTER;
-
-        JButton fillPersonalInfoButton = new JButton("Fill in personal information");
         fillPersonalInfoButton.setEnabled(false);
         fillPersonalInfoButton.addActionListener(e ->
                 new CheckinDialog(owner, Integer.parseInt(numberOfPeopleTextField.getText())));
-
-        JButton confirmButton = new JButton("Confirm");
-        confirmButton.setEnabled(true);
-        confirmButton.addActionListener(e -> {
-            if (checkThatTextBoxesAreFilled(fillPersonalInfoButton)) {
-                checkinDatePicker.setEnabled(false);
-                checkoutDatePicker.setEnabled(false);
-                roomTypes.setEnabled(false);
-                numberOfPeopleTextField.setEditable(false);
-            }
-        });
-
-        panel.add(confirmButton, constraints);
         panel.add(fillPersonalInfoButton, constraints);
     }
 
-    private boolean checkThatTextBoxesAreFilled(JButton fillInPersonalInfButton) {
+    private boolean checkThatTextBoxesAreFilled() {
         List<String> textBoxes = new ArrayList<>();
-        checkinDate = checkinDatePicker.getText();
-        checkoutDate = checkoutDatePicker.getText();
-        roomNumber = roomNumberTextField.getText();
-        numberOfPeople = numberOfPeopleTextField.getText();
-        textBoxes.add(checkinDate);
-        textBoxes.add(checkoutDate);
-        textBoxes.add(roomNumber);
-        textBoxes.add(numberOfPeople);
+        if (withReservationCheckBox.isSelected()) {
+            textBoxes.add(evidenceIdTextField.getText());
+        }
+        textBoxes.add(checkinDatePicker.getText());
+        textBoxes.add(checkoutDatePicker.getText());
+        textBoxes.add(roomNumberTextField.getText());
+        textBoxes.add(numberOfPeopleTextField.getText());
 
-        boolean isFilled = isFilled(textBoxes);
-        fillInPersonalInfButton.setEnabled(isFilled);
-        return isFilled;
-    }
-
-    private boolean isFilled(List<String> textBoxes) {
         for (String textBox : textBoxes) {
             if (textBox.isEmpty())
                 return false;
         }
         return true;
+    }
+
+    private String getEvidenceID() {
+        return evidenceIdTextField.getText();
+    }
+
+    private LocalDate getCheckinDate() {
+        return checkinDatePicker.getDate();
+    }
+
+    private LocalDate getCheckoutDate() {
+        return checkoutDatePicker.getDate();
+    }
+
+    private RoomType getRoomType() {
+        return (RoomType) roomTypes.getSelectedItem();
+    }
+
+    private Long getRoomNumber() {
+        return Long.parseLong(roomNumberTextField.getText());
     }
 }
