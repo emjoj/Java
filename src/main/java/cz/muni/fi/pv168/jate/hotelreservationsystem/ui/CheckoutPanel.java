@@ -100,7 +100,7 @@ final class CheckoutPanel {
         loadData(list);
         //setEnabled(false);
     }
-
+    /*
     private void disableEmptyRooms(JList list) {
         for (int i = 0; i < reservations.size(); i ++) {
             if (reservations.get(i);
@@ -110,6 +110,8 @@ final class CheckoutPanel {
             }
         }
     }
+
+     */
 
     private void loadRoomNumber(Object selectedRoomNumber){
         for (Reservation reservation : reservations) {
