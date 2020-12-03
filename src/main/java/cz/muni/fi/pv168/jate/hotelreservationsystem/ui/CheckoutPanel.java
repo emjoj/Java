@@ -49,8 +49,6 @@ final class CheckoutPanel {
         reservations.add(reservation1);
     }
 
-
-
     CheckoutPanel(Dashboard owner) {
         this.owner = owner;
         createReservationsList();
@@ -96,22 +94,8 @@ final class CheckoutPanel {
         JScrollPane listScroller = new JScrollPane(list);
         listScroller.setPreferredSize(new Dimension(250, 80));
         panel.add(new JScrollPane(list),gbc);
-        System.out.println(list.getSelectedValue());
         loadData(list);
-        //setEnabled(false);
     }
-    /*
-    private void disableEmptyRooms(JList list) {
-        for (int i = 0; i < reservations.size(); i ++) {
-            if (reservations.get(i);
-                list.setSelectedIndex(i);
-
-
-            }
-        }
-    }
-
-     */
 
     private void loadRoomNumber(Object selectedRoomNumber){
         for (Reservation reservation : reservations) {
@@ -123,16 +107,11 @@ final class CheckoutPanel {
 
     }
     private void loadData(JList list){
-
-
         list.addListSelectionListener(
                 new ListSelectionListener() {
                     @Override
                     public void valueChanged(ListSelectionEvent e) {
                         loadRoomNumber(list.getSelectedValue());
-                        System.out.println(list.getSelectedValue());
-
-
 
                         long nights = DAYS.between(checkoutRoom.getCheckinDate(), checkoutRoom.getCheckoutDate());
                         long pricePerNight = setPrice(checkoutRoom.getRoom().getRoomType());
