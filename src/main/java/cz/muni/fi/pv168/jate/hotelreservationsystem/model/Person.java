@@ -5,6 +5,25 @@ import java.util.Objects;
 
 public class Person {
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+        return Objects.equals(id, person.id) &&
+                firstName.equals(person.firstName) &&
+                lastName.equals(person.lastName) &&
+                birthDate.equals(person.birthDate) &&
+                evidenceID.equals(person.evidenceID) &&
+                Objects.equals(phoneNumber, person.phoneNumber) &&
+                Objects.equals(email, person.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, firstName, lastName, birthDate, evidenceID, phoneNumber, email);
+    }
+
     private Long id;
     private String firstName;
     private String lastName;
