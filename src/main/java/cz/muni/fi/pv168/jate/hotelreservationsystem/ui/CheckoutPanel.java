@@ -1,5 +1,4 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
-import cz.muni.fi.pv168.jate.hotelreservationsystem.data.ReservationDao;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Person;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Reservation;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Room;
@@ -41,8 +40,8 @@ final class CheckoutPanel {
     CheckoutPanel(Dashboard owner) {
 
         this.owner = owner;
-        getReservations();
-        //createReservationsList();
+
+        //getReservations();
         //setStatetoCheckedIn();
         panel.setLayout(new GridBagLayout());
 
