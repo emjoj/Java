@@ -98,13 +98,13 @@ final class CheckinPanel {
                 roomNumberTextField.setText(Long.toString(findRoom()));
             } else {
                 if (getRoomType() == RoomType.SMALL) {
-                    numberOfPeopleSpinner.setModel(new SpinnerNumberModel(0, 1, 2, 1));
+                    numberOfPeopleSpinner.setModel(new SpinnerNumberModel(1, 1, 2, 1));
                 }
                 if (getRoomType() == RoomType.MEDIUM) {
-                    numberOfPeopleSpinner.setModel(new SpinnerNumberModel(0, 1, 3, 1));
+                    numberOfPeopleSpinner.setModel(new SpinnerNumberModel(1, 1, 3, 1));
                 }
                 if (getRoomType() == RoomType.BIG) {
-                    numberOfPeopleSpinner.setModel(new SpinnerNumberModel(0, 1, 4, 1));
+                    numberOfPeopleSpinner.setModel(new SpinnerNumberModel(1, 1, 4, 1));
                 }
             }
         });
