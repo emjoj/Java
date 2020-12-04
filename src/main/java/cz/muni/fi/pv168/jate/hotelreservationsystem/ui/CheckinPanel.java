@@ -61,8 +61,11 @@ final class CheckinPanel {
         panel.add(withReservationCheckBox, constraints);
         withReservationCheckBox.addActionListener(e -> {
             reservationIDTextField.setEditable(withReservationCheckBox.isSelected());
-            if (!withReservationCheckBox.isSelected())
-                getInitState();
+            if (!withReservationCheckBox.isSelected()) {
+                noReservationInitFields();
+            } else {
+                reservationInitFiels();
+            }
         });
         constraints.gridy++;
 
@@ -84,7 +87,8 @@ final class CheckinPanel {
         checkoutDatePicker.disableUntil(checkinDatePicker.getDate().plusDays(1));
         checkoutDatePicker.addDateChangeListener(e -> {
             fillPersonalInfoButton.setEnabled(checkThatFieldsAreFilled());
-            updateRoomTypes(getFreeRoomNumbers(checkinDatePicker.getDate(), checkoutDatePicker.getDate()));
+            if (getCheckoutDate() != null)
+                updateRoomTypes(getFreeRoomNumbers(getCheckinDate(), getCheckoutDate()));
         });
         panel.add(checkoutDatePicker, constraints);
         constraints.gridy++;
@@ -114,14 +118,12 @@ final class CheckinPanel {
         fillPersonalInfoButton.addActionListener(e -> {
             CheckinDialog checkinDialog = new CheckinDialog(owner.getFrame(), (Integer) numberOfPeopleSpinner.getValue());
             checkinDialog.getPeopleAtOneRoom().forEach((person -> owner.getPersonDao().create(person)));
-            if (!withReservationCheckBox.isSelected()) {
+            if (!withReservationCheckBox.isSelected() && checkinDialog.isConfirmed()) {
                 checkinWithoutPriorReservation(checkinDialog.getPeopleAtOneRoom().get(0));
             }
         });
 
-        constraints.insets = new
-
-                Insets(20, 15, 4, 4);
+        constraints.insets = new Insets(20, 15, 4, 4);
         panel.add(fillPersonalInfoButton, constraints);
     }
 
@@ -194,7 +196,7 @@ final class CheckinPanel {
     }
 
     private long findRoom() {
-        List<Long> freeRoomNumbers = getFreeRoomNumbers(checkinDatePicker.getDate(), checkoutDatePicker.getDate());
+        List<Long> freeRoomNumbers = getFreeRoomNumbers(getCheckinDate(), getCheckoutDate());
         long freeRoomID = 0;
 
         if (getRoomType() == RoomType.SMALL) {
@@ -236,7 +238,7 @@ final class CheckinPanel {
                 (owner.getReservationDao().findByID(getReservationID()) != null)) {
             validateFieldsWhenPriorReservationCreated();
         } else {
-            clearFields();
+            reservationInitFiels();
         }
     }
 
@@ -259,18 +261,22 @@ final class CheckinPanel {
 
     }
 
-    private void clearFields() {
-        checkoutDatePicker.setDate(checkinDatePicker.getDate().plusDays(1));
+    private void reservationInitFiels() {
+        checkoutDatePicker.clear();
+        checkinDatePicker.setEnabled(false);
+        checkoutDatePicker.setEnabled(false);
         roomTypes.setEnabled(false);
-        roomNumberTextField.setText("0");
+        roomNumberTextField.setText("");
         numberOfPeopleSpinner.setEnabled(false);
         fillPersonalInfoButton.setEnabled(false);
     }
 
-    private void getInitState() {
+    private void noReservationInitFields() {
         checkinDatePicker.setEnabled(true);
+        checkoutDatePicker.clear();
         checkoutDatePicker.setEnabled(true);
         roomTypes.setEnabled(true);
+        roomNumberTextField.setText("");
         numberOfPeopleSpinner.setEnabled(true);
     }
 

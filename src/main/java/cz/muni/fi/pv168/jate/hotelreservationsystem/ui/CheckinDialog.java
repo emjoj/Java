@@ -15,6 +15,7 @@ final class CheckinDialog {
     private final JDialog dialog;
     private final JComboBox popUpMenu;
     private final boolean[] areFormsFilled;
+    private boolean confirmed = false;
 
     private final List<Person> peopleAtOneRoom = new ArrayList<>();
 
@@ -76,6 +77,10 @@ final class CheckinDialog {
         if (isAlreadyFilled())
             for (Component form : forms.getComponents()) {
                 var confirmButton = (JButton) Arrays.stream(((JPanel) form).getComponents()).filter(a -> a instanceof JButton).collect(Collectors.toList()).get(1);
+                confirmButton.addActionListener(e -> {
+                    confirmed = true;
+                    dialog.dispose();
+                });
                 confirmButton.setEnabled(true);
             }
     }
@@ -107,5 +112,9 @@ final class CheckinDialog {
 
     public List<Person> getPeopleAtOneRoom() {
         return peopleAtOneRoom;
+    }
+
+    public boolean isConfirmed() {
+        return confirmed;
     }
 }
