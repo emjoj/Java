@@ -1,7 +1,6 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem;
 
 import cz.muni.fi.pv168.jate.hotelreservationsystem.data.*;
-import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Person;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.ui.Dashboard;
 import org.apache.derby.jdbc.*;
 
@@ -22,7 +21,7 @@ public class Main {
 
     private static EmbeddedDataSource initDataSource() {
         EmbeddedDataSource dataSource = new EmbeddedDataSource();
-        String dbPath = System.getProperty("user.LENOVO") + "/hotel-reservation-system";
+        String dbPath = System.getProperty("user.LENOVO") + "/hotel-reservation-systemNew";
         dataSource.setDatabaseName(dbPath);
         dataSource.setCreateDatabase("create");
 

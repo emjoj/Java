@@ -1,9 +1,10 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
-
+import cz.muni.fi.pv168.jate.hotelreservationsystem.data.ReservationDao;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Person;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Reservation;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Room;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomType;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.ReservationState;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -11,6 +12,7 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -35,18 +37,15 @@ final class CheckoutPanel {
     Reservation reservation2 = new Reservation(new Person("Erik","Cooper",LocalDate.of(1999, 1, 13),"876JOI"),
             new Room((long) 3, RoomType.SMALL), LocalDate.of(2017, 1, 13),LocalDate.of(2017, 1, 25));
 
-    ArrayList<Reservation> reservations = new ArrayList<>();
-
-    private void createReservationsList(){
-        reservations.add(reservation2);
-        reservations.add(reservation1);
-    }
 
     CheckoutPanel(Dashboard owner) {
+
         this.owner = owner;
         getReservations();
-        createReservationsList();
+        //createReservationsList();
+        //setStatetoCheckedIn();
         panel.setLayout(new GridBagLayout());
+
         panel.setName("Check-out");
         addRoomNumberTitle();
 
@@ -57,19 +56,24 @@ final class CheckoutPanel {
         addTitle("Payment Information");
         addFinalSum();
         addCheckoutButton();
+
+
     }
 
     private void getReservations(){
         owner.getPersonDao().create(new Person("Alan","Holly",LocalDate.of(1997, 1, 13),"HU9876"));
+        Person person = owner.getPersonDao().findByEvidence("HU9876");
         owner.getPersonDao().create(new Person("Erik","Cooper",LocalDate.of(1999, 1, 13),"876JOI"));
+        Person person1 = owner.getPersonDao().findByEvidence("876JOI");
         ArrayList<Person> persons = new ArrayList<>(owner.getPersonDao().findAll());
+        //System.out.println(persons.get(0));
 
 
 
-      //  owner.getReservationDao().create(new Reservation(person,
-       //         new Room((long) 3, RoomType.SMALL), LocalDate.of(2017, 1, 13),LocalDate.of(2017, 1, 25)));
-     //owner.getReservationDao().create(new Reservation(person1,
-        //        new Room((long) 1, RoomType.SMALL), LocalDate.of(2017, 1, 13),LocalDate.of(2017, 1, 15)));
+      owner.getReservationDao().create(new Reservation(person,
+                new Room((long) 3, RoomType.SMALL), LocalDate.of(2020,12, 13),LocalDate.of(2020, 1, 25)));
+     owner.getReservationDao().create(new Reservation(person1,
+                new Room((long) 1, RoomType.SMALL), LocalDate.of(2020, 12, 13),LocalDate.of(2020, 1, 17)));
 
     }
 
@@ -85,32 +89,35 @@ final class CheckoutPanel {
         createListOfRooms();
     }
 
-    private void createListOfRoomsNew(){
+    private void setStatetoCheckedIn() {
         List<Long> data = new ArrayList<>();
         for (Reservation reservation : owner.getReservationDao().findAll()) {
-            data.add(reservation.getRoom().getId());
-        }
+            reservation.setState(ReservationState.CHECKEDIN);
+
+            if (reservation.getState() == ReservationState.CHECKEDIN) {
+                data.add(reservation.getRoom().getId());
+            }
+            //System.out.println(reservation.getState());
         /*
         for (Reservation reservation : owner.getReservationDao().findAll()) {
             if(reservation.getState() == CHECKIN)
                 data.add(reservation.getRoom().getId());
         }
-
          */
+        }
+
     }
 
     private void createListOfRooms(){
-        /*
+
         List<Long> data = new ArrayList<>();
 
-        for(int i=1; i <=20;i ++){
-            data.add((long)i);
-        }
-         */
-        List<Long> data = new ArrayList<>();
         for (Reservation reservation : owner.getReservationDao().findAll()) {
-            data.add(reservation.getRoom().getId());
+            if(reservation.getState() == ReservationState.CHECKEDIN){
+                data.add(reservation.getRoom().getId());
+            }
         }
+        data.sort(Comparator.naturalOrder());
 
         JList list = new JList(data.toArray());
 
@@ -126,7 +133,7 @@ final class CheckoutPanel {
     }
 
     private Reservation loadRoomNumberInformation(Object selectedRoomNumber){
-        for (Reservation reservation : reservations) {
+        for (Reservation reservation : owner.getReservationDao().findAll()) {
             if (reservation.getRoom().getId().equals((selectedRoomNumber))) {
                 return reservation;
             }
@@ -184,7 +191,6 @@ final class CheckoutPanel {
         textField.setHorizontalAlignment(JTextField.CENTER);
         textField.setDisabledTextColor(Color.BLACK);
         panel.add(textField, gbc);
-
     }
 
     private void addGuestInformation() {
