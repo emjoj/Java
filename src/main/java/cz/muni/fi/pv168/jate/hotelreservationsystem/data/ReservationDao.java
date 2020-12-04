@@ -118,6 +118,40 @@ public class ReservationDao {
         }
     }
 
+    public Reservation findByID(Long ID) {
+        try (var connection = dataSource.getConnection();
+             var st = connection.prepareStatement("SELECT R.ID, OWNER_ID, ROOM_ID, CHECKIN, CHECKOUT, STATE," +
+                     " FIRST_NAME, LAST_NAME, BIRTH_DATE," +
+                     " EVIDENCE, EMAIL, PHONE_NUMBER" +
+                     " FROM RESERVATION AS R INNER JOIN PERSON AS P" +
+                     " ON OWNER_ID = P.ID" +
+                     " WHERE R.ID = ?")) {
+            st.setLong(1, ID);
+            try (var rs = st.executeQuery()) {
+                Reservation reservation = null;
+                while (rs.next()) {
+                    reservation = new Reservation(
+                            new Person(rs.getLong("OWNER_ID"),
+                                    rs.getString("FIRST_NAME"),
+                                    rs.getString("LAST_NAME"),
+                                    rs.getDate("BIRTH_DATE").toLocalDate(),
+                                    rs.getString("EVIDENCE"),
+                                    rs.getString("EMAIL"),
+                                    rs.getString("PHONE_NUMBER")),
+                            new Room(rs.getLong("ROOM_ID"),
+                                    RoomType.getType(rs.getLong("ROOM_ID"))),
+                            rs.getDate("CHECKIN").toLocalDate(),
+                            rs.getDate("CHECKOUT").toLocalDate(),
+                            ReservationState.getState(rs.getInt("STATE")));
+                    reservation.setId(rs.getLong("ID"));
+                }
+                return reservation;
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Failed find reservation by id", ex);
+        }
+    }
+
     public void updateReservation(Reservation reservation) {
         if (reservation.getId() == null) {
             throw new IllegalArgumentException("Reservation has null ID");
