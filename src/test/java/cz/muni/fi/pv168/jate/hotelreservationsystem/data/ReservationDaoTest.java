@@ -52,6 +52,21 @@ final class ReservationDaoTest {
                 .containsExactly(reservation);
     }
 
+    @Test
+    void findByID() {
+        var tomik = new Person("Tomík", "Drobík",
+                LocalDate.of(1998,1, 20), "123456789kek");
+        var room = new Room(1L, RoomType.SMALL);
+        var reservation = new Reservation(tomik, room,
+                LocalDate.of(1996,1, 20),
+                LocalDate.of(1998,1, 20));
+        personDao.create(tomik);
+        reservationDao.create(reservation);
+        assertThat(tomik.getId())
+                .isNotNull();
+        assertThat(reservationDao.findByID(tomik.getId())).isEqualTo(reservation);
+    }
+
     @AfterEach
     void cleanUp() {
         reservationDao.dropTable();
