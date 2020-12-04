@@ -15,6 +15,7 @@ public class Main {
         PersonDao personDao = new PersonDao(dataSource);
 
         ReservationDao reservationDao = new ReservationDao(dataSource);
+
         EventQueue.invokeLater(() -> new Dashboard(personDao, reservationDao).show());
     }
 
