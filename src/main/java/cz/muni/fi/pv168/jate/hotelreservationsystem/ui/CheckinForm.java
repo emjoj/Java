@@ -1,6 +1,7 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
 import com.github.lgooddatepicker.components.DatePicker;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Person;
 
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
@@ -14,17 +15,17 @@ import static java.awt.GridBagConstraints.HORIZONTAL;
 
 public class CheckinForm {
 
-    private JPanel form;
-    private CheckinDialog parent;
-    private int personNumber;
+    private final JPanel form;
+    private final CheckinDialog parent;
+    private final int personNumber;
 
-    private JTextField firstNameTextField = new JTextField(10);
-    private JTextField lastNameTextField = new JTextField(14);
-    private DatePicker dateOfBirthPicker = new DatePicker();
-    private JTextField idCardTextField = new JTextField(10);
-    private JButton confirmButton = new JButton("Confirm");
+    private final JTextField firstNameTextField = new JTextField(10);
+    private final JTextField lastNameTextField = new JTextField(14);
+    private final DatePicker dateOfBirthPicker = new DatePicker();
+    private final JTextField idCardTextField = new JTextField(10);
+    private final JButton confirmButton = new JButton("Confirm");
 
-    private JButton saveButton = new JButton("Save");
+    private final JButton saveButton = new JButton("Save");
 
     public CheckinForm(int personNumber, CheckinDialog parent) {
         this.parent = parent;
@@ -76,6 +77,8 @@ public class CheckinForm {
         confirmButton.addActionListener(e -> parent.getDialog().dispose());
 
         saveButton.setEnabled(false);
+        saveButton.addActionListener(e ->
+                parent.addPerson(new Person(getFirstName(), getLastName(), getDateOfBirth(), getEvidenceID())));
         form.add(saveButton, constraints);
         form.add(confirmButton, constraints);
 
@@ -120,12 +123,12 @@ public class CheckinForm {
         return lastNameTextField.getText();
     }
 
-    public LocalDate dateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirthPicker.getDate();
     }
 
-    public Long getEvidenceID() {
-        return Long.parseLong(idCardTextField.getText());
+    public String getEvidenceID() {
+        return idCardTextField.getText();
     }
 
 }

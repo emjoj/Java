@@ -1,28 +1,22 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Person;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 final class CheckinDialog {
 
     private final JPanel forms;
-
-    public JDialog getDialog() {
-        return dialog;
-    }
-
-    public JComboBox getPopUpMenu() {
-        return popUpMenu;
-    }
-
     private final JDialog dialog;
     private final JComboBox popUpMenu;
     private final boolean[] areFormsFilled;
+
+    private final List<Person> peopleAtOneRoom = new ArrayList<>();
 
     CheckinDialog(Window owner, int numberOfPanels) {
         areFormsFilled = new boolean[numberOfPanels];
@@ -56,7 +50,8 @@ final class CheckinDialog {
         List<String> comboBoxItems = new ArrayList<>();
         for (int i = 1; i <= numberOfPanels; i++) {
             CheckinForm newForm = new CheckinForm(i, this);
-            newForm.getSaveButton().addActionListener(e -> updateComboBoxItems(newForm.getFirstName(), newForm.getPersonNumber() - 1));
+            newForm.getSaveButton().addActionListener(e ->
+                    updateComboBoxItems(newForm.getFirstName(), newForm.getPersonNumber() - 1));
             forms.add(newForm.getForm(), "Person " + i);
             comboBoxItems.add("Person " + i);
         }
@@ -102,4 +97,15 @@ final class CheckinDialog {
         return dialog;
     }
 
+    public JDialog getDialog() {
+        return dialog;
+    }
+
+    public void addPerson(Person person) {
+        peopleAtOneRoom.add(person);
+    }
+
+    public List<Person> getPeopleAtOneRoom() {
+        return peopleAtOneRoom;
+    }
 }
