@@ -84,6 +84,46 @@ final class ReservationDaoTest {
         assertThat(reservationDao.findByID(reservation.getId())).isEqualTo(reservation);
     }
 
+    @Test
+    void findByState() {
+        PersonGenerator pg = new PersonGenerator();
+        var boi = pg.getRandomPerson();
+        var kek = pg.getRandomPerson();
+        var kekito = pg.getRandomPerson();
+        var ripito = pg.getRandomPerson();
+
+        var room1 = new Room(1L, RoomType.SMALL);
+        var room2 = new Room(2L, RoomType.SMALL);
+        var room3 = new Room(3L, RoomType.SMALL);
+        var room4 = new Room(4L, RoomType.SMALL);
+        var badreservation1 = new Reservation(boi, room1,
+                LocalDate.of(2000,1, 20),
+                LocalDate.of(2002,1, 20),
+                ReservationState.CREATED);
+        var goodreservation1 = new Reservation(boi, room2,
+                LocalDate.of(2000,1, 20),
+                LocalDate.of(2002,1, 20),
+                ReservationState.CHECKEDIN);
+        var goodreservation2 = new Reservation(boi, room3,
+                LocalDate.of(2000,1, 20),
+                LocalDate.of(2002,1, 20),
+                ReservationState.CHECKEDIN);
+        var badreservation2 = new Reservation(boi, room4,
+                LocalDate.of(2000,1, 20),
+                LocalDate.of(2002,1, 20),
+                ReservationState.CHECKEDOUT);
+        personDao.create(boi);
+        personDao.create(kek);
+        personDao.create(kekito);
+        personDao.create(ripito);
+        reservationDao.create(badreservation1);
+        reservationDao.create(badreservation2);
+        reservationDao.create(goodreservation1);
+        reservationDao.create(goodreservation2);
+        assertThat(reservationDao.findbyState(ReservationState.CHECKEDIN))
+                .containsExactlyInAnyOrder(goodreservation1, goodreservation2);
+    }
+
     @AfterEach
     void cleanUp() {
         reservationDao.dropTable();
