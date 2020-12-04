@@ -1,6 +1,7 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
 import com.github.lgooddatepicker.components.DatePicker;
+import com.github.lgooddatepicker.optionalusertools.*;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.*;
 
 import javax.swing.*;
@@ -31,14 +32,16 @@ final class NewReservationPanel {
         gbc.gridy = 0;
         panel.add(createDatePickers(), gbc);
 
-        gbc.gridy++;
         JButton createReservationButton = new JButton("Create reservation");
         roomTypesPanel = new RoomTypesPanel(createReservationButton);
-        panel.add(roomTypesPanel.getPanel(), gbc);
 
         gbc.gridy++;
+        panel.add(roomTypesPanel.getPanel(), gbc);
+
         createReservationButton.setEnabled(false);
         createReservationButton.addActionListener(e -> createReservations());
+
+        gbc.gridy++;
         panel.add(createReservationButton, gbc);
     }
 
@@ -52,13 +55,13 @@ final class NewReservationPanel {
 
         gbc.insets = new Insets(0, 3, 0, 3);
 
-        datePickerPanel.add(createDatePickerField("Check-in date"), gbc);
-        datePickerPanel.add(createDatePickerField("Check-out date"), gbc);
+        datePickerPanel.add(createDatePickerField("Check-in date", checkinDatePicker, checkinDateChanged()), gbc);
+        datePickerPanel.add(createDatePickerField("Check-out date", checkoutDatePicker, checkoutDateChanged()), gbc);
 
         return datePickerPanel;
     }
 
-    private JPanel createDatePickerField(String label) {
+    private JPanel createDatePickerField(String label, DatePicker datePicker, DateChangeListener handler) {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -68,29 +71,29 @@ final class NewReservationPanel {
 
         gbc.gridy++;
         gbc.ipady = 5;
-        if (label.contains("in")) {
-            checkinDatePicker.addDateChangeListener(e -> checkinDateChanged());
-            panel.add(checkinDatePicker, gbc);
-        } else if (label.contains("out")) {
-            checkoutDatePicker.addDateChangeListener(e -> checkoutDateChanged());
-            panel.add(checkoutDatePicker, gbc);
-        }
+
+        datePicker.addDateChangeListener(handler);
+        panel.add(datePicker, gbc);
 
         return panel;
     }
 
-    private void checkinDateChanged() {
-        if (checkinDatePicker.getDate() != null) {
-            checkoutDatePicker.disableUntil(checkinDatePicker.getDate().plusDays(1));
-        }
-        validateDatePickers();
+    private DateChangeListener checkinDateChanged() {
+        return dateChangeEvent -> {
+            if (checkinDatePicker.getDate() != null) {
+                checkoutDatePicker.disableUntil(checkinDatePicker.getDate().plusDays(1));
+            }
+            validateDatePickers();
+        };
     }
 
-    private void checkoutDateChanged() {
-        if (checkoutDatePicker.getDate() != null) {
-            checkinDatePicker.disableAfter(checkoutDatePicker.getDate().minusDays(1));
-        }
-        validateDatePickers();
+    private DateChangeListener checkoutDateChanged() {
+        return dateChangeEvent -> {
+            if (checkoutDatePicker.getDate() != null) {
+                checkinDatePicker.disableAfter(checkoutDatePicker.getDate().minusDays(1));
+            }
+            validateDatePickers();
+        };
     }
 
     private void validateDatePickers() {
@@ -133,17 +136,20 @@ final class NewReservationPanel {
     private void createReservations() {
         NewReservationDialog personInformation = new NewReservationDialog(owner);
 
-        if ((reservationCreator = initReservationCreator(personInformation)) == null) {
+        if (!personInformation.isConfirmed()) {
             return;
         }
 
+        reservationCreator = createReservationOwner(personInformation);
         owner.getPersonDao().create(reservationCreator);
 
         List<Long> freeRoomNumbers = getFreeRoomNumbers(checkinDatePicker.getDate(), checkoutDatePicker.getDate());
 
         for (RoomType roomType : RoomType.values()) {
             int index = roomType.ordinal();
-            createReservationByRoomType(roomTypesPanel.getCheckBoxes().get(index),
+
+            createReservationsByRoomType(
+                    roomTypesPanel.getCheckBoxes().get(index),
                     roomTypesPanel.getSpinners().get(index),
                     roomType,
                     freeRoomNumbers);
@@ -152,11 +158,7 @@ final class NewReservationPanel {
         validateDatePickers();
     }
 
-    private Person initReservationCreator(NewReservationDialog personInformation) {
-        if (!personInformation.isConfirmed()) {
-            return null;
-        }
-
+    private Person createReservationOwner(NewReservationDialog personInformation) {
         Person person = new Person(
                 personInformation.getName(),
                 personInformation.getSurname(),
@@ -171,7 +173,7 @@ final class NewReservationPanel {
         return person;
     }
 
-    private void createReservationByRoomType(JCheckBox checkBox, JSpinner spinner, RoomType roomType, List<Long> freeRoomNumbers) {
+    private void createReservationsByRoomType(JCheckBox checkBox, JSpinner spinner, RoomType roomType, List<Long> freeRoomNumbers) {
         if (!checkBox.isSelected() || (int) spinner.getValue() == 0) {
             return;
         }
