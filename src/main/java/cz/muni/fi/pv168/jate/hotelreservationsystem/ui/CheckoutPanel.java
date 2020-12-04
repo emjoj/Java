@@ -26,7 +26,7 @@ final class CheckoutPanel {
     private final JButton checkOutButton = new JButton("Check-out");
     private final JLabel totalCost = new JLabel("0");
     private final Dashboard owner;
-    private JScrollPane listScroller = new JScrollPane();
+    private JScrollPane listScroller = null;
 
     CheckoutPanel(Dashboard owner) {
 
@@ -70,8 +70,11 @@ final class CheckoutPanel {
         list.setFixedCellHeight(20);
         list.setFixedCellWidth(30);
 
+        if (listScroller == null) {
+            listScroller = new JScrollPane();
+            panel.add(listScroller,gbc);
+        }
         listScroller.setViewportView(list);
-        panel.add(listScroller,gbc);
         loadData(list);
     }
     private void loadData(JList list){
@@ -116,9 +119,8 @@ final class CheckoutPanel {
         } else {
             checkOutButton.setEnabled(true);
             data.sort(Comparator.naturalOrder());
-            createListOfRooms(data);
-
         }
+        createListOfRooms(data);
     }
 
     private Reservation loadRoomNumberInformation(Object selectedRoomNumber){
