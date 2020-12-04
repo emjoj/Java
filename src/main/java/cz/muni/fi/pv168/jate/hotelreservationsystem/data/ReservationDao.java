@@ -158,7 +158,7 @@ public class ReservationDao {
         }
         try (var connection = dataSource.getConnection();
              var st = connection.prepareStatement(
-                     "UPDATE RESERVATION SET OWENER_ID = ?, ROOM_ID = ?, CHECKIN = ?, CHECKOUT = ?, STATE = ? WHERE ID = ?")) {
+                     "UPDATE RESERVATION SET OWNER_ID = ?, ROOM_ID = ?, CHECKIN = ?, CHECKOUT = ?, STATE = ? WHERE ID = ?")) {
             st.setLong(1, reservation.getOwner().getId());
             st.setLong(2, reservation.getRoom().getId());
             st.setDate(3, Date.valueOf(reservation.getCheckinDate()));

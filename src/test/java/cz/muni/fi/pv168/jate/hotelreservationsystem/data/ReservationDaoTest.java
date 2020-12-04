@@ -2,6 +2,7 @@ package cz.muni.fi.pv168.jate.hotelreservationsystem.data;
 
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Person;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Reservation;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.ReservationState;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Room;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomType;
 import org.apache.derby.jdbc.EmbeddedDataSource;
@@ -65,6 +66,22 @@ final class ReservationDaoTest {
         assertThat(tomik.getId())
                 .isNotNull();
         assertThat(reservationDao.findByID(tomik.getId())).isEqualTo(reservation);
+    }
+
+    @Test
+    void updateReservation() {
+        PersonGenerator pg = new PersonGenerator();
+        var boi = pg.getRandomPerson();
+        var room = new Room(1L, RoomType.SMALL);
+        var reservation = new Reservation(boi, room,
+                LocalDate.of(2000,1, 20),
+                LocalDate.of(2002,1, 20),
+                ReservationState.CREATED);
+        personDao.create(boi);
+        reservationDao.create(reservation);
+        reservation.setState(ReservationState.CHECKEDIN);
+        reservationDao.updateReservation(reservation);
+        assertThat(reservationDao.findByID(reservation.getId())).isEqualTo(reservation);
     }
 
     @AfterEach
