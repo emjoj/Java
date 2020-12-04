@@ -15,17 +15,14 @@ public class Main {
 
         ReservationDao reservationDao = new ReservationDao(dataSource);
 
-
         EventQueue.invokeLater(() -> new Dashboard(personDao, reservationDao).show());
     }
 
     private static EmbeddedDataSource initDataSource() {
         EmbeddedDataSource dataSource = new EmbeddedDataSource();
-        String dbPath = System.getProperty("user.LENOVO") + "/hotel-reservation-systemNew";
+        String dbPath = System.getProperty("user.home") + "/hotel-reservation-system";
         dataSource.setDatabaseName(dbPath);
         dataSource.setCreateDatabase("create");
-
-
 
         return dataSource;
     }
