@@ -12,6 +12,7 @@ public class Main {
         EmbeddedDataSource dataSource = initDataSource();
 
         PersonDao personDao = new PersonDao(dataSource);
+
         ReservationDao reservationDao = new ReservationDao(dataSource);
 
         EventQueue.invokeLater(() -> new Dashboard(personDao, reservationDao).show());

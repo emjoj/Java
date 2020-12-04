@@ -118,6 +118,29 @@ public class ReservationDao {
         }
     }
 
+    public void updateReservation(Reservation reservation) {
+        if (reservation.getId() == null) {
+            throw new IllegalArgumentException("Reservation has null ID");
+        }
+        try (var connection = dataSource.getConnection();
+             var st = connection.prepareStatement(
+                     "UPDATE RESERVATION SET OWENER_ID = ?, ROOM_ID = ?, CHECKIN = ?, CHECKOUT = ?, STATE = ? WHERE ID = ?")) {
+            st.setLong(1, reservation.getOwner().getId());
+            st.setLong(2, reservation.getRoom().getId());
+            st.setDate(3, Date.valueOf(reservation.getCheckinDate()));
+            st.setDate(4, Date.valueOf(reservation.getCheckoutDate()));
+            st.setInt(5, reservation.getState().getValue());
+            st.setLong(6, reservation.getId());
+            int rowsUpdated = st.executeUpdate();
+            if (rowsUpdated == 0) {
+                throw new DataAccessException("Failed to update non-existing employee: " + reservation);
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Failed to update employee " + reservation, ex);
+        }
+
+    }
+
     public void dropTable() {
         try (var connection = dataSource.getConnection();
              var st = connection.createStatement()) {
