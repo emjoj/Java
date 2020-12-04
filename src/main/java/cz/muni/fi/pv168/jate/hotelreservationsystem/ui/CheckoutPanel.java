@@ -1,4 +1,5 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.data.DataAccessException;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Person;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Reservation;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Room;
@@ -24,29 +25,30 @@ final class CheckoutPanel {
     private JTextField roomText;
     private JTextField priceText;
     private JTextField nightsText;
+    private Reservation checkoutRoom;
 
-    private final GridBagConstraints gbc = new GridBagConstraints();
+    private GridBagConstraints gbc = new GridBagConstraints();
     private final JPanel panel = new JPanel();
+    private final JButton checkOutButton = new JButton("Check-out");
     private final JLabel totalCost = new JLabel("0");
-    private Dashboard owner;
-
-    Reservation reservation1 = new Reservation(new Person("Alan","Holly",LocalDate.of(1997, 1, 13),"HU9876"),
-            new Room((long) 1, RoomType.SMALL), LocalDate.of(2017, 1, 13),LocalDate.of(2017, 1, 15));
-
-    Reservation reservation2 = new Reservation(new Person("Erik","Cooper",LocalDate.of(1999, 1, 13),"876JOI"),
-            new Room((long) 3, RoomType.SMALL), LocalDate.of(2017, 1, 13),LocalDate.of(2017, 1, 25));
-
+    private final Dashboard owner;
 
     CheckoutPanel(Dashboard owner) {
 
         this.owner = owner;
-
+        //owner.getPersonDao().dropTable();
+        //owner.getReservationDao().dropTable();
         //getReservations();
-        //setStatetoCheckedIn();
-        panel.setLayout(new GridBagLayout());
+        createCheckOutForm();
+    }
 
+    private void createCheckOutForm() {
+        panel.setLayout(new GridBagLayout());
         panel.setName("Check-out");
         addRoomNumberTitle();
+        if(!(getCheckedInReservations().isEmpty())){
+            createListOfRooms(getCheckedInReservations());
+        }else checkOutButton.setEnabled(false);
 
         addTitle("Guest Information");
         addGuestInformation();
@@ -55,8 +57,6 @@ final class CheckoutPanel {
         addTitle("Payment Information");
         addFinalSum();
         addCheckoutButton();
-
-
     }
 
     private void getReservations(){
@@ -64,10 +64,6 @@ final class CheckoutPanel {
         Person person = owner.getPersonDao().findByEvidence("HU9876");
         owner.getPersonDao().create(new Person("Erik","Cooper",LocalDate.of(1999, 1, 13),"876JOI"));
         Person person1 = owner.getPersonDao().findByEvidence("876JOI");
-        ArrayList<Person> persons = new ArrayList<>(owner.getPersonDao().findAll());
-        //System.out.println(persons.get(0));
-
-
 
       owner.getReservationDao().create(new Reservation(person,
                 new Room((long) 3, RoomType.SMALL), LocalDate.of(2020,12, 13),LocalDate.of(2020, 1, 25)));
@@ -83,67 +79,30 @@ final class CheckoutPanel {
     private void addRoomNumberTitle() {
         gbc.anchor = GridBagConstraints.FIRST_LINE_START;
         addLabel("Room number:");
-
         gbc.gridx = 1;
-        createListOfRooms();
-    }
-
-    private void setStatetoCheckedIn() {
-        List<Long> data = new ArrayList<>();
-        for (Reservation reservation : owner.getReservationDao().findAll()) {
-            reservation.setState(ReservationState.CHECKEDIN);
-
-            if (reservation.getState() == ReservationState.CHECKEDIN) {
-                data.add(reservation.getRoom().getId());
-            }
-            //System.out.println(reservation.getState());
-        /*
-        for (Reservation reservation : owner.getReservationDao().findAll()) {
-            if(reservation.getState() == CHECKIN)
-                data.add(reservation.getRoom().getId());
-        }
-         */
-        }
 
     }
 
-    private void createListOfRooms(){
-
-        List<Long> data = new ArrayList<>();
-
-        for (Reservation reservation : owner.getReservationDao().findAll()) {
-            if(reservation.getState() == ReservationState.CHECKEDIN){
-                data.add(reservation.getRoom().getId());
-            }
-        }
-        data.sort(Comparator.naturalOrder());
-
+    private void createListOfRooms(List<Long> data){
         JList list = new JList(data.toArray());
-
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setLayoutOrientation(JList.VERTICAL_WRAP);
-        list.setVisibleRowCount(4);
+
+        list.setVisibleRowCount(0);
         list.setFixedCellHeight(20);
         list.setFixedCellWidth(30);
-        JScrollPane listScroller = new JScrollPane(list);
-        listScroller.setPreferredSize(new Dimension(250, 80));
-        panel.add(new JScrollPane(list),gbc);
-        loadData(list);
-    }
 
-    private Reservation loadRoomNumberInformation(Object selectedRoomNumber){
-        for (Reservation reservation : owner.getReservationDao().findAll()) {
-            if (reservation.getRoom().getId().equals((selectedRoomNumber))) {
-                return reservation;
-            }
-        }return null;
+        JScrollPane listScroller = new JScrollPane(list);
+        //listScroller.setPreferredSize(new Dimension(250, 80));
+        panel.add(listScroller,gbc);
+        loadData(list);
     }
     private void loadData(JList list){
         list.addListSelectionListener(
                 new ListSelectionListener() {
                     @Override
                     public void valueChanged(ListSelectionEvent e) {
-                        Reservation checkoutRoom = loadRoomNumberInformation(list.getSelectedValue());
+                        checkoutRoom = loadRoomNumberInformation(list.getSelectedValue());
 
                         long nights = DAYS.between(checkoutRoom.getCheckinDate(), checkoutRoom.getCheckoutDate());
                         long pricePerNight = setPrice(checkoutRoom.getRoom().getRoomType());
@@ -158,8 +117,8 @@ final class CheckoutPanel {
                     }
                 }
         );
-
     }
+
     private long setPrice(RoomType roomType) {
         switch (roomType) {
             case SMALL:
@@ -170,6 +129,36 @@ final class CheckoutPanel {
                 return 150;
             default: return 0;
         }
+    }
+
+
+    public List<Long> getCheckedInReservations() {
+        List<Long> data = new ArrayList<>();
+
+        try
+        {
+            for (Reservation reservation : owner.getReservationDao().findAll()) {
+                if(reservation.getState() == ReservationState.CHECKEDIN){
+                    data.add(reservation.getRoom().getId());
+                }
+            }
+            data.sort(Comparator.naturalOrder());
+            checkOutButton.setEnabled(true);
+            return data;
+        }
+        catch (DataAccessException e)
+    {
+        return data;
+        }
+    }
+
+    private Reservation loadRoomNumberInformation(Object selectedRoomNumber){
+        for (Reservation reservation : owner.getReservationDao().findAll()) {
+            if (reservation.getRoom().getId().equals((selectedRoomNumber))) {
+
+                return reservation;
+            }
+        }return null;
     }
 
     private void addTitle(String title) {
@@ -241,61 +230,36 @@ final class CheckoutPanel {
         gbc.gridy++;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
-        JButton checkOut = new JButton("Check-out");
-        checkOut.addActionListener(e -> {
-            // TODO
-            /*
-        Reservation reservation = owner.getReservationDao().findReservationbyId();
-        reservation.setState(CHECKEDOUT);
 
+        checkOutButton.addActionListener(e -> {
+            for (Reservation reservation : owner.getReservationDao().findAll()) {
 
-             */
-
-
+                if (reservation.getRoom().getId().equals((checkoutRoom.getRoom().getId()))) {
+                    reservation.setState(ReservationState.CHECKEDOUT);
+                    owner.getReservationDao().updateReservation(reservation);
+                }
+            }
+            panel.revalidate();
+            panel.repaint();
+            resetTextFields();
 
         });
-        panel.add(checkOut, gbc);
+        panel.add(checkOutButton, gbc);
+    }
+    private void resetTextFields(){
+        firstNameText.setText("");
+        lastNameText.setText("");
+        roomText.setText("");
+        priceText.setText("");
+        nightsText.setText("");
+        checkoutRoom = null;
+        totalCost.setText("0");
+
     }
 
     private void addLabel(String s) {
         panel.add(new JLabel(s), gbc);
         gbc.gridy++;
     }
-/*
-    private void addNights() {
-        gbc.gridy++;
-        nights = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
-        nights.addChangeListener(handleNightCountChange());
-        panel.add(nights, gbc);
-    }
-
-    public ActionListener handleRoomTypeChange() {
-        return e -> {
-            String type = (String) roomTypes.getSelectedItem();
-            switch (Objects.requireNonNull(type)) {
-                case "1-bed room":
-                    sumPerNight = 50;
-                    break;
-                case "2-bed room":
-                    sumPerNight = 100;
-                    break;
-                case "3-bed room":
-                    sumPerNight = 150;
-                    break;
-            }
-            totalCost.setText(Integer.toString((Integer) nights.getValue() * sumPerNight));
-        };
-    }
-
-    public ChangeListener handleNightCountChange() {
-        return e -> {
-            int cost = (Integer) nights.getValue() * sumPerNight;
-            totalCost.setText(Integer.toString(cost));
-        };
-
-    }
-
-     */
-
 
 }
