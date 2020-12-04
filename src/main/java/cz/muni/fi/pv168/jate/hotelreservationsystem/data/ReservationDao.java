@@ -2,6 +2,7 @@ package cz.muni.fi.pv168.jate.hotelreservationsystem.data;
 
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Person;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Reservation;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.ReservationState;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Room;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomType;
 
@@ -36,6 +37,7 @@ public class ReservationDao {
             st.setLong(2, reservation.getRoom().getId());
             st.setDate(3, Date.valueOf(reservation.getCheckinDate()));
             st.setDate(4, Date.valueOf(reservation.getCheckoutDate()));
+            st.setInt(5,reservation.getState().getValue());
 
             st.executeUpdate();
             try (var rs = st.getGeneratedKeys()) {
@@ -84,7 +86,7 @@ public class ReservationDao {
 
     public List<Reservation> findAll() {
         try (var connection = dataSource.getConnection();
-             var st = connection.prepareStatement("SELECT R.ID, OWNER_ID, ROOM_ID, CHECKIN, CHECKOUT," +
+             var st = connection.prepareStatement("SELECT R.ID, OWNER_ID, ROOM_ID, CHECKIN, CHECKOUT, STATE," +
                      " FIRST_NAME, LAST_NAME, BIRTH_DATE," +
                      " EVIDENCE, EMAIL, PHONE_NUMBER" +
                      " FROM RESERVATION AS R INNER JOIN PERSON AS P" +
@@ -104,7 +106,8 @@ public class ReservationDao {
                             new Room(rs.getLong("ROOM_ID"),
                                     RoomType.getType(rs.getLong("ROOM_ID"))),
                             rs.getDate("CHECKIN").toLocalDate(),
-                            rs.getDate("CHECKOUT").toLocalDate());
+                            rs.getDate("CHECKOUT").toLocalDate(),
+                            ReservationState.getState(rs.getInt("STATE")));
                     reservation.setId(rs.getLong("ID"));
                     reservations.add(reservation);
                 }
