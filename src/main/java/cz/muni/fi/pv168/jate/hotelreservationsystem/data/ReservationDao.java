@@ -30,7 +30,7 @@ public class ReservationDao {
         }
         try (var connection = dataSource.getConnection();
              var st = connection.prepareStatement(
-                     "INSERT INTO RESERVATION (OWNER_ID, ROOM_ID, CHECKIN, CHECKOUT) VALUES (?, ?, ?, ?)",
+                     "INSERT INTO RESERVATION (OWNER_ID, ROOM_ID, CHECKIN, CHECKOUT, STATE) VALUES (?, ?, ?, ?, ?)",
                      RETURN_GENERATED_KEYS)) {
             st.setLong(1, reservation.getOwner().getId());
             st.setLong(2, reservation.getRoom().getId());
@@ -74,7 +74,8 @@ public class ReservationDao {
                     "OWNER_ID BIGINT NOT NULL REFERENCES PERSON(ID)," +
                     "ROOM_ID BIGINT NOT NULL," +
                     "CHECKIN DATE NOT NULL," +
-                    "CHECKOUT DATE NOT NULL" +
+                    "CHECKOUT DATE NOT NULL," +
+                    "STATE INT NOT NULL" +
                     ")");
         } catch (SQLException ex) {
             throw new DataAccessException("Failed to create RESERVATION table", ex);
