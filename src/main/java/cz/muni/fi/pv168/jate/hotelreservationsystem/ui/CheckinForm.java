@@ -74,7 +74,6 @@ public class CheckinForm {
         constraints.gridy++;
 
         confirmButton.setEnabled(false);
-        confirmButton.addActionListener(e -> parent.getDialog().dispose());
 
         saveButton.setEnabled(false);
         saveButton.addActionListener(e ->
