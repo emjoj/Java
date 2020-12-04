@@ -12,7 +12,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionListener;
 import java.time.LocalDate;
 
 final class NewReservationDialog {
@@ -25,6 +24,7 @@ final class NewReservationDialog {
     private final JTextField phoneNumberTextField = new JTextField(15);
     private final JTextField emailTextField = new JTextField(15);
     private final JButton confirmButton = new JButton("Confirm");
+    private boolean confirmed = false;
 
     NewReservationDialog(Dashboard owner) {
         dialog = new JDialog(owner.getFrame());
@@ -94,7 +94,10 @@ final class NewReservationDialog {
         gbc.insets = new Insets(20, 0, 10, 0);
         gbc.ipady = 0;
         confirmButton.setEnabled(false);
-        confirmButton.addActionListener(e -> dialog.dispose());
+        confirmButton.addActionListener(e -> {
+            confirmed = true;
+            dialog.dispose();
+        });
         panel.add(confirmButton, gbc);
 
         dialog.add(panel);
@@ -147,5 +150,9 @@ final class NewReservationDialog {
 
     public String getEmail() {
         return emailTextField.getText();
+    }
+
+    public boolean isConfirmed() {
+        return confirmed;
     }
 }

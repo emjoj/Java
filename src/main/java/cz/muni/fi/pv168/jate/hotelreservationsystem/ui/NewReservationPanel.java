@@ -116,8 +116,10 @@ final class NewReservationPanel {
                     .collect(Collectors.toList());
 
             List<Reservation> NonCollidingReservationsForCurrentRoom = reservationsForCurrentRoom.stream()
-                    .filter(reservation -> (reservation.getCheckinDate().compareTo(checkinDate) < 0
+                    .filter(reservation -> (
+                            reservation.getCheckinDate().compareTo(checkinDate) < 0
                             && reservation.getCheckoutDate().compareTo(checkinDate) <= 0)
+
                             || reservation.getCheckinDate().compareTo(checkoutDate) >= 0)
                     .collect(Collectors.toList());
 
@@ -139,26 +141,19 @@ final class NewReservationPanel {
 
         List<Long> freeRoomNumbers = getFreeRoomNumbers(checkinDatePicker.getDate(), checkoutDatePicker.getDate());
 
-        createReservationByType(roomTypesPanel.getSmallCheckBox(),
-                roomTypesPanel.getSmallSpinner(),
-                RoomType.SMALL,
-                freeRoomNumbers);
-
-        createReservationByType(roomTypesPanel.getMediumCheckBox(),
-                roomTypesPanel.getMediumSpinner(),
-                RoomType.MEDIUM,
-                freeRoomNumbers);
-
-        createReservationByType(roomTypesPanel.getBigCheckBox(),
-                roomTypesPanel.getBigSpinner(),
-                RoomType.BIG,
-                freeRoomNumbers);
+        for (RoomType roomType : RoomType.values()) {
+            int index = roomType.ordinal();
+            createReservationByRoomType(roomTypesPanel.getCheckBoxes().get(index),
+                    roomTypesPanel.getSpinners().get(index),
+                    roomType,
+                    freeRoomNumbers);
+        }
 
         validateDatePickers();
     }
 
     private Person initReservationCreator(NewReservationDialog personInformation) {
-        if (personInformation.getName().isEmpty()) {
+        if (!personInformation.isConfirmed()) {
             return null;
         }
 
@@ -172,35 +167,21 @@ final class NewReservationPanel {
         person.setEmail(personInformation.getEmail().isEmpty() ?
                 null :
                 personInformation.getEmail());
+
         return person;
     }
 
-    private void createReservationByType(JCheckBox checkBox, JSpinner spinner, RoomType roomType, List<Long> freeRoomNumbers) {
-        if (!checkBox.isSelected()) {
+    private void createReservationByRoomType(JCheckBox checkBox, JSpinner spinner, RoomType roomType, List<Long> freeRoomNumbers) {
+        if (!checkBox.isSelected() || (int) spinner.getValue() == 0) {
             return;
         }
 
-        List<Long> freeRoomNumbersByType = new ArrayList<>();
-        switch (roomType) {
-            case SMALL:
-                freeRoomNumbersByType = freeRoomNumbers.stream()
-                        .filter(number -> number < 8)
-                        .collect(Collectors.toList());
-                break;
-            case MEDIUM:
-                freeRoomNumbersByType = freeRoomNumbers.stream()
-                        .filter(number -> number >= 8 && number < 15)
-                        .collect(Collectors.toList());
-                break;
-            case BIG:
-                freeRoomNumbersByType = freeRoomNumbers.stream()
-                        .filter(number -> number >= 15 && number <= 20)
-                        .collect(Collectors.toList());
-                break;
-        }
+        List<Long> freeRoomNumbersByRoomType = freeRoomNumbers.stream()
+                .filter(roomNumber -> RoomType.getType(roomNumber) == roomType)
+                .collect(Collectors.toList());
 
         for (int i = 0; i < (int) spinner.getValue(); i++) {
-            Room freeRoom = new Room(freeRoomNumbersByType.get(i), roomType);
+            Room freeRoom = new Room(freeRoomNumbersByRoomType.get(i), roomType);
             createReservation(freeRoom, reservationCreator);
         }
     }
