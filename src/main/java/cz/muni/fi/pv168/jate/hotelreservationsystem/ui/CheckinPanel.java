@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.awt.GridBagConstraints.CENTER;
 import static java.awt.GridBagConstraints.HORIZONTAL;
 
 final class CheckinPanel {
@@ -49,10 +48,9 @@ final class CheckinPanel {
 
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.ipady = 10;
-        constraints.insets = new Insets(4, 0, 4, 0);
+        constraints.insets = new Insets(4, 15, 4, 4);
         constraints.fill = HORIZONTAL;
-        constraints.gridy = 1;
-
+        constraints.gridy = 0;
         fillCheckinPanel(panel, constraints);
 
         return panel;
@@ -61,24 +59,23 @@ final class CheckinPanel {
     private void fillCheckinPanel(JPanel panel, GridBagConstraints constraints) {
         panel.add(new JLabel("With prior reservation:"), constraints);
         panel.add(withReservationCheckBox, constraints);
+        withReservationCheckBox.addActionListener(e -> {
+            reservationIDTextField.setEditable(withReservationCheckBox.isSelected());
+            if (!withReservationCheckBox.isSelected())
+                getInitState();
+        });
         constraints.gridy++;
 
         panel.add(new JLabel("reservation ID: "), constraints);
         reservationIDTextField.setEditable(false);
-        panel.add(reservationIDTextField, constraints);
         reservationIDTextField.addCaretListener(e -> {
-            if (!reservationIDTextField.getText().isEmpty() && (owner.getReservationDao().findByID(getReservationID()) != null))
-                validateFieldsWhenReservationCreated();
+            if (withReservationCheckBox.isSelected())
+                checkinWithPriorReservation();
         });
-        withReservationCheckBox.addActionListener(e -> reservationIDTextField.setEditable(withReservationCheckBox.isSelected()));
-
+        panel.add(reservationIDTextField, constraints);
         constraints.gridy++;
 
         panel.add(new JLabel("Check - in date:"), constraints);
-        checkoutDatePicker.addDateChangeListener(e -> {
-            fillPersonalInfoButton.setEnabled(checkThatTextBoxesAreFilled());
-            updateRoomTypes(getFreeRoomNumbers(checkinDatePicker.getDate(), checkoutDatePicker.getDate()));
-        });
         checkinDatePicker.setDateToToday();
         panel.add(checkinDatePicker, constraints);
         constraints.gridy++;
@@ -86,7 +83,8 @@ final class CheckinPanel {
         panel.add(new JLabel("Check - out date:"), constraints);
         checkoutDatePicker.disableUntil(checkinDatePicker.getDate().plusDays(1));
         checkoutDatePicker.addDateChangeListener(e -> {
-            fillPersonalInfoButton.setEnabled(checkThatTextBoxesAreFilled());
+            fillPersonalInfoButton.setEnabled(checkThatFieldsAreFilled());
+            updateRoomTypes(getFreeRoomNumbers(checkinDatePicker.getDate(), checkoutDatePicker.getDate()));
         });
         panel.add(checkoutDatePicker, constraints);
         constraints.gridy++;
@@ -96,47 +94,38 @@ final class CheckinPanel {
         roomTypes.addActionListener(e -> {
             if (!withReservationCheckBox.isSelected()) {
                 roomNumberTextField.setText(Long.toString(findRoom()));
-            } else {
-                if (getRoomType() == RoomType.SMALL) {
-                    numberOfPeopleSpinner.setModel(new SpinnerNumberModel(0, 1, 2, 1));
-                }
-                if (getRoomType() == RoomType.MEDIUM) {
-                    numberOfPeopleSpinner.setModel(new SpinnerNumberModel(0, 1, 3, 1));
-                }
-                if (getRoomType() == RoomType.BIG) {
-                    numberOfPeopleSpinner.setModel(new SpinnerNumberModel(0, 1, 4, 1));
-                }
             }
+            updateNumberOfPeopleSpinner();
         });
         constraints.gridy++;
 
         panel.add(new JLabel("Room number:"), constraints);
-        roomNumberTextField.addCaretListener(e -> fillPersonalInfoButton.setEnabled(checkThatTextBoxesAreFilled()));
+        roomNumberTextField.addCaretListener(e -> fillPersonalInfoButton.setEnabled(checkThatFieldsAreFilled()));
         roomNumberTextField.setEditable(false);
         panel.add(roomNumberTextField, constraints);
         constraints.gridy++;
 
         panel.add(new JLabel("Number of people:"), constraints);
-        numberOfPeopleSpinner.addChangeListener(e -> fillPersonalInfoButton.setEnabled(checkThatTextBoxesAreFilled()));
+        numberOfPeopleSpinner.addChangeListener(e -> fillPersonalInfoButton.setEnabled(checkThatFieldsAreFilled()));
         panel.add(numberOfPeopleSpinner, constraints);
         constraints.gridy++;
 
-        constraints.fill = CENTER;
         fillPersonalInfoButton.setEnabled(false);
         fillPersonalInfoButton.addActionListener(e -> {
-            CheckinDialog checkinDialog = new CheckinDialog(owner.getFrame(), Integer.parseInt(numberOfPeopleSpinner.getValue().toString()));
+            CheckinDialog checkinDialog = new CheckinDialog(owner.getFrame(), (Integer) numberOfPeopleSpinner.getValue());
+            checkinDialog.getPeopleAtOneRoom().forEach((person -> owner.getPersonDao().create(person)));
             if (!withReservationCheckBox.isSelected()) {
-                createReservation(checkinDialog.getPeopleAtOneRoom().get(0));
-                checkinDialog.getPeopleAtOneRoom().remove(0);
-            }
-            for (Person p : checkinDialog.getPeopleAtOneRoom()) {
-                owner.getPersonDao().create(p);
+                checkinWithoutPriorReservation(checkinDialog.getPeopleAtOneRoom().get(0));
             }
         });
+
+        constraints.insets = new
+
+                Insets(20, 15, 4, 4);
         panel.add(fillPersonalInfoButton, constraints);
     }
 
-    private boolean checkThatTextBoxesAreFilled() {
+    private boolean checkThatFieldsAreFilled() {
         List<String> textBoxes = new ArrayList<>();
         if (withReservationCheckBox.isSelected()) {
             textBoxes.add(reservationIDTextField.getText());
@@ -234,29 +223,67 @@ final class CheckinPanel {
         return freeRoomID;
     }
 
-    private void createReservation(Person person) {
-        owner.getPersonDao().create(person);
-        Reservation reservation = new Reservation(person, new Room(getRoomNumber(), (RoomType) roomTypes.getSelectedItem()), getCheckinDate(), getCheckoutDate(), ReservationState.CHECKEDIN);
+    private void checkinWithoutPriorReservation(Person person) {
+        Reservation reservation = new Reservation(person, new Room(getRoomNumber(), (RoomType) roomTypes.getSelectedItem()),
+                getCheckinDate(), getCheckoutDate(), ReservationState.CHECKEDIN);
         owner.getReservationDao().create(reservation);
         updateRoomTypes(getFreeRoomNumbers(checkinDatePicker.getDate(), checkoutDatePicker.getDate()));
         owner.getReservationDao().updateReservation(reservation);
     }
 
-    private void validateFieldsWhenReservationCreated() {
+    private void checkinWithPriorReservation() {
+        if (!reservationIDTextField.getText().isEmpty() &&
+                (owner.getReservationDao().findByID(getReservationID()) != null)) {
+            validateFieldsWhenPriorReservationCreated();
+        } else {
+            clearFields();
+        }
+    }
+
+    private void validateFieldsWhenPriorReservationCreated() {
         Long reservationID = getReservationID();
         Reservation reservation = owner.getReservationDao().findByID(reservationID);
         reservation.setState(ReservationState.CHECKEDIN);
         owner.getReservationDao().updateReservation(reservation);
+
         checkinDatePicker.setDate(reservation.getCheckinDate());
         checkoutDatePicker.setDate(reservation.getCheckoutDate());
         roomTypes.setSelectedItem(reservation.getRoom().getRoomType());
         roomNumberTextField.setText(reservation.getRoom().getId().toString());
 
+        numberOfPeopleSpinner.setEnabled(true);
         checkinDatePicker.setEnabled(false);
         checkoutDatePicker.setEnabled(false);
         roomTypes.setEnabled(false);
         roomNumberTextField.setEditable(false);
 
+    }
+
+    private void clearFields() {
+        checkoutDatePicker.setDate(checkinDatePicker.getDate().plusDays(1));
+        roomTypes.setEnabled(false);
+        roomNumberTextField.setText("0");
+        numberOfPeopleSpinner.setEnabled(false);
+        fillPersonalInfoButton.setEnabled(false);
+    }
+
+    private void getInitState() {
+        checkinDatePicker.setEnabled(true);
+        checkoutDatePicker.setEnabled(true);
+        roomTypes.setEnabled(true);
+        numberOfPeopleSpinner.setEnabled(true);
+    }
+
+    private void updateNumberOfPeopleSpinner() {
+        if (getRoomType() == RoomType.SMALL) {
+            numberOfPeopleSpinner.setModel(new SpinnerNumberModel(1, 1, 2, 1));
+        }
+        if (getRoomType() == RoomType.MEDIUM) {
+            numberOfPeopleSpinner.setModel(new SpinnerNumberModel(1, 1, 3, 1));
+        }
+        if (getRoomType() == RoomType.BIG) {
+            numberOfPeopleSpinner.setModel(new SpinnerNumberModel(1, 1, 4, 1));
+        }
     }
 
     private Long getReservationID() {
