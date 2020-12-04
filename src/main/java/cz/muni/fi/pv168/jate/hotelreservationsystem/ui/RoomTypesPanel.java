@@ -30,7 +30,7 @@ final class RoomTypesPanel {
         gbc.insets = new Insets(0, 5, 10, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        gbc.gridy = -1;
+        gbc.gridy = 0;
 
         for (RoomType roomType : RoomType.values()) {
             JCheckBox checkBox = new JCheckBox(roomType.name());
@@ -48,7 +48,6 @@ final class RoomTypesPanel {
             spinner.addChangeListener(e -> handleCheckBoxAndSpinnerChange());
             spinners.add(spinner);
 
-            gbc.gridy++;
             checkBox.addActionListener(e -> spinner.setEnabled(checkBox.isSelected()));
             checkBox.addActionListener(e -> handleCheckBoxAndSpinnerChange());
             panel.add(checkBox, gbc);
@@ -59,6 +58,8 @@ final class RoomTypesPanel {
             gbc.insets = new Insets(0, 5, 10, 5);
             spinner.setPreferredSize(new Dimension(60, 30));
             panel.add(spinner, gbc);
+
+            gbc.gridy++;
         }
     }
 
