@@ -14,13 +14,7 @@ public class Main {
 
         PersonDao personDao = new PersonDao(dataSource);
         ReservationDao reservationDao = new ReservationDao(dataSource, personDao);
-        PersonGenerator pg = new PersonGenerator();
-        personDao.create(pg.getRandomPerson());
-        personDao.create(pg.getRandomPerson());
-        personDao.create(pg.getRandomPerson());
-        for (Person kek: personDao.findAll()) {
-            System.out.println(kek);
-        }
+
 
         EventQueue.invokeLater(() -> new Dashboard(personDao, reservationDao).show());
     }
