@@ -47,26 +47,26 @@ final class NewReservationDialog {
         addRequiredLabel("Name", panel, gbc);
         addRequiredLabel("Surname", panel, gbc);
 
-        gbc.gridy++;
         nameTextField.addCaretListener(e -> validateRequiredFields());
-        panel.add(nameTextField, gbc);
-
         surnameTextField.addCaretListener(e -> validateRequiredFields());
+
+        gbc.gridy++;
+        panel.add(nameTextField, gbc);
         panel.add(surnameTextField, gbc);
 
         gbc.gridy++;
         addRequiredLabel("Date of birth", panel, gbc);
         addRequiredLabel("Evidence ID", panel, gbc);
 
+        birthDateDatePicker.addDateChangeListener(e -> validateRequiredFields());
         gbc.gridy++;
         gbc.ipadx = 12;
         gbc.ipady = 5;
-        birthDateDatePicker.addDateChangeListener(e -> validateRequiredFields());
         panel.add(birthDateDatePicker, gbc);
 
+        evidenceIDTextField.addCaretListener(e -> validateRequiredFields());
         gbc.ipadx = 0;
         gbc.ipady = 10;
-        evidenceIDTextField.addCaretListener(e -> validateRequiredFields());
         panel.add(evidenceIDTextField, gbc);
 
         gbc.gridx = 0;
@@ -80,8 +80,8 @@ final class NewReservationDialog {
         gbc.gridy++;
         addRequiredLabel("Phone Number", panel, gbc);
 
-        gbc.gridy++;
         phoneNumberTextField.addCaretListener(e -> validateRequiredFields());
+        gbc.gridy++;
         panel.add(phoneNumberTextField, gbc);
 
         gbc.gridy++;
@@ -90,14 +90,14 @@ final class NewReservationDialog {
         gbc.gridy++;
         panel.add(emailTextField, gbc);
 
-        gbc.gridy++;
-        gbc.insets = new Insets(20, 0, 10, 0);
-        gbc.ipady = 0;
         confirmButton.setEnabled(false);
         confirmButton.addActionListener(e -> {
             confirmed = true;
             dialog.dispose();
         });
+        gbc.gridy++;
+        gbc.insets = new Insets(20, 0, 10, 0);
+        gbc.ipady = 0;
         panel.add(confirmButton, gbc);
 
         dialog.add(panel);
