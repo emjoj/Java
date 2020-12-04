@@ -9,6 +9,7 @@ public class Reservation {
     private Room room;
     private LocalDate checkinDate;
     private LocalDate checkoutDate;
+    private ReservationState state;
 
     @Override
     public boolean equals(Object o) {
@@ -19,12 +20,13 @@ public class Reservation {
                 Objects.equals(owner, that.owner) &&
                 Objects.equals(room, that.room) &&
                 Objects.equals(checkinDate, that.checkinDate) &&
-                Objects.equals(checkoutDate, that.checkoutDate);
+                Objects.equals(checkoutDate, that.checkoutDate)&&
+                Objects.equals(state, that.state);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, owner, room, checkinDate, checkoutDate);
+        return Objects.hash(id, owner, room, checkinDate, checkoutDate, state);
     }
 
     public Reservation(Person owner, Room room, LocalDate checkinDate, LocalDate checkoutDate) {
@@ -32,6 +34,15 @@ public class Reservation {
         this.room = room;
         this.checkinDate = checkinDate;
         this.checkoutDate = checkoutDate;
+        this.state = ReservationState.CREATED;
+    }
+
+    public Reservation(Person owner, Room room, LocalDate checkinDate, LocalDate checkoutDate, ReservationState state) {
+        this.owner = owner;
+        this.room = room;
+        this.checkinDate = checkinDate;
+        this.checkoutDate = checkoutDate;
+        this.state = state;
     }
 
     @Override
@@ -83,5 +94,13 @@ public class Reservation {
 
     public void setCheckoutDate(LocalDate checkoutDate) {
         this.checkoutDate = checkoutDate;
+    }
+
+    public ReservationState getState() {
+        return state;
+    }
+
+    public void setState(ReservationState state) {
+        this.state = state;
     }
 }

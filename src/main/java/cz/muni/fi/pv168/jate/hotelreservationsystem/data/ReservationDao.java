@@ -1,6 +1,8 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.data;
 
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Person;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Reservation;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.ReservationState;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Room;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomType;
 
@@ -14,11 +16,9 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class ReservationDao {
     private final DataSource dataSource;
-    private final PersonDao personDao;
 
-    public ReservationDao(DataSource dataSource, PersonDao personDao) {
+    public ReservationDao(DataSource dataSource) {
         this.dataSource = dataSource;
-        this.personDao = personDao;
         initTable();
     }
 
@@ -31,12 +31,13 @@ public class ReservationDao {
         }
         try (var connection = dataSource.getConnection();
              var st = connection.prepareStatement(
-                     "INSERT INTO RESERVATION (OWNER_ID, ROOM_ID, CHECKIN, CHECKOUT) VALUES (?, ?, ?, ?)",
+                     "INSERT INTO RESERVATION (OWNER_ID, ROOM_ID, CHECKIN, CHECKOUT, STATE) VALUES (?, ?, ?, ?, ?)",
                      RETURN_GENERATED_KEYS)) {
             st.setLong(1, reservation.getOwner().getId());
             st.setLong(2, reservation.getRoom().getId());
             st.setDate(3, Date.valueOf(reservation.getCheckinDate()));
             st.setDate(4, Date.valueOf(reservation.getCheckoutDate()));
+            st.setInt(5,reservation.getState().getValue());
 
             st.executeUpdate();
             try (var rs = st.getGeneratedKeys()) {
@@ -75,7 +76,8 @@ public class ReservationDao {
                     "OWNER_ID BIGINT NOT NULL REFERENCES PERSON(ID)," +
                     "ROOM_ID BIGINT NOT NULL," +
                     "CHECKIN DATE NOT NULL," +
-                    "CHECKOUT DATE NOT NULL" +
+                    "CHECKOUT DATE NOT NULL," +
+                    "STATE INT NOT NULL" +
                     ")");
         } catch (SQLException ex) {
             throw new DataAccessException("Failed to create RESERVATION table", ex);
@@ -84,25 +86,93 @@ public class ReservationDao {
 
     public List<Reservation> findAll() {
         try (var connection = dataSource.getConnection();
-             var st = connection.prepareStatement("SELECT ID, OWNER_ID, ROOM_ID, CHECKIN, CHECKOUT FROM RESERVATION")) {
+             var st = connection.prepareStatement("SELECT R.ID, OWNER_ID, ROOM_ID, CHECKIN, CHECKOUT, STATE," +
+                     " FIRST_NAME, LAST_NAME, BIRTH_DATE," +
+                     " EVIDENCE, EMAIL, PHONE_NUMBER" +
+                     " FROM RESERVATION AS R INNER JOIN PERSON AS P" +
+                     " ON OWNER_ID = P.ID")) {
 
             List<Reservation> reservations = new ArrayList<>();
             try (var rs = st.executeQuery()) {
                 while (rs.next()) {
                     Reservation reservation = new Reservation(
-                            personDao.findByID(rs.getLong("OWNER_ID")),
+                            new Person(rs.getLong("OWNER_ID"),
+                                    rs.getString("FIRST_NAME"),
+                                    rs.getString("LAST_NAME"),
+                                    rs.getDate("BIRTH_DATE").toLocalDate(),
+                                    rs.getString("EVIDENCE"),
+                                    rs.getString("EMAIL"),
+                                    rs.getString("PHONE_NUMBER")),
                             new Room(rs.getLong("ROOM_ID"),
                                     RoomType.getType(rs.getLong("ROOM_ID"))),
                             rs.getDate("CHECKIN").toLocalDate(),
-                            rs.getDate("CHECKOUT").toLocalDate());
+                            rs.getDate("CHECKOUT").toLocalDate(),
+                            ReservationState.getState(rs.getInt("STATE")));
                     reservation.setId(rs.getLong("ID"));
                     reservations.add(reservation);
                 }
             }
             return reservations;
         } catch (SQLException ex) {
-            throw new DataAccessException("Failed to load all persons", ex);
+            throw new DataAccessException("Failed to load all reservations", ex);
         }
+    }
+
+    public Reservation findByID(Long ID) {
+        try (var connection = dataSource.getConnection();
+             var st = connection.prepareStatement("SELECT R.ID, OWNER_ID, ROOM_ID, CHECKIN, CHECKOUT, STATE," +
+                     " FIRST_NAME, LAST_NAME, BIRTH_DATE," +
+                     " EVIDENCE, EMAIL, PHONE_NUMBER" +
+                     " FROM RESERVATION AS R INNER JOIN PERSON AS P" +
+                     " ON OWNER_ID = P.ID" +
+                     " WHERE R.ID = ?")) {
+            st.setLong(1, ID);
+            try (var rs = st.executeQuery()) {
+                Reservation reservation = null;
+                while (rs.next()) {
+                    reservation = new Reservation(
+                            new Person(rs.getLong("OWNER_ID"),
+                                    rs.getString("FIRST_NAME"),
+                                    rs.getString("LAST_NAME"),
+                                    rs.getDate("BIRTH_DATE").toLocalDate(),
+                                    rs.getString("EVIDENCE"),
+                                    rs.getString("EMAIL"),
+                                    rs.getString("PHONE_NUMBER")),
+                            new Room(rs.getLong("ROOM_ID"),
+                                    RoomType.getType(rs.getLong("ROOM_ID"))),
+                            rs.getDate("CHECKIN").toLocalDate(),
+                            rs.getDate("CHECKOUT").toLocalDate(),
+                            ReservationState.getState(rs.getInt("STATE")));
+                    reservation.setId(rs.getLong("ID"));
+                }
+                return reservation;
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Failed find reservation by id", ex);
+        }
+    }
+
+    public void updateReservation(Reservation reservation) {
+        if (reservation.getId() == null) {
+            throw new IllegalArgumentException("Reservation has null ID");
+        }
+        try (var connection = dataSource.getConnection();
+             var st = connection.prepareStatement(
+                     "UPDATE RESERVATION SET OWENER_ID = ?, ROOM_ID = ?, CHECKIN = ?, CHECKOUT = ?, STATE = ? WHERE ID = ?")) {
+            st.setLong(1, reservation.getOwner().getId());
+            st.setLong(2, reservation.getRoom().getId());
+            st.setDate(3, Date.valueOf(reservation.getCheckinDate()));
+            st.setDate(4, Date.valueOf(reservation.getCheckoutDate()));
+            st.setInt(5, reservation.getState().getValue());
+            st.setLong(6, reservation.getId());
+            int rowsUpdated = st.executeUpdate();
+            if (rowsUpdated == 0) {
+                throw new DataAccessException("Failed to update non-existing employee: " + reservation);
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Failed to update employee " + reservation, ex);
+        }
+
     }
 
     public void dropTable() {

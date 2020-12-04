@@ -4,6 +4,7 @@ import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Person;
 
 import javax.sql.DataSource;
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,22 +94,38 @@ public class PersonDao {
              var st = connection.prepareStatement("SELECT ID, FIRST_NAME, LAST_NAME, BIRTH_DATE," +
                      " EVIDENCE, EMAIL, PHONE_NUMBER FROM PERSON WHERE ID = ?")) {
             st.setLong(1, ID);
-            try (var rs = st.executeQuery()) {
-                Person person = null;
-                while (rs.next()) {
-                    person = new Person(
-                            rs.getString("FIRST_NAME"),
-                            rs.getString("LAST_NAME"),
-                            rs.getDate("BIRTH_DATE").toLocalDate(),
-                            rs.getString("EVIDENCE"));
-                    person.setEmail(rs.getString("EMAIL"));
-                    person.setPhoneNumber(rs.getString("PHONE_NUMBER"));
-                    person.setId(rs.getLong("ID"));
-                }
-                return person;
-            }
+            return getPerson(st);
         } catch (SQLException ex) {
             throw new DataAccessException("Failed to find person by ID", ex);
+        }
+    }
+
+    // returns null if person not in database
+    public Person findByEvidence(String evidence) {
+        try (var connection = dataSource.getConnection();
+             var st = connection.prepareStatement("SELECT ID, FIRST_NAME, LAST_NAME, BIRTH_DATE," +
+                     " EVIDENCE, EMAIL, PHONE_NUMBER FROM PERSON WHERE EVIDENCE = ?")) {
+            st.setString(1, evidence);
+            return getPerson(st);
+        } catch (SQLException ex) {
+            throw new DataAccessException("Failed to find person by ID", ex);
+        }
+    }
+
+    private Person getPerson(PreparedStatement st) throws SQLException {
+        try (var rs = st.executeQuery()) {
+            Person person = null;
+            while (rs.next()) {
+                person = new Person(
+                        rs.getString("FIRST_NAME"),
+                        rs.getString("LAST_NAME"),
+                        rs.getDate("BIRTH_DATE").toLocalDate(),
+                        rs.getString("EVIDENCE"));
+                person.setEmail(rs.getString("EMAIL"));
+                person.setPhoneNumber(rs.getString("PHONE_NUMBER"));
+                person.setId(rs.getLong("ID"));
+            }
+            return person;
         }
     }
 
