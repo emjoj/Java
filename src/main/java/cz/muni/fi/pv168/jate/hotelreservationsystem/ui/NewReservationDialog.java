@@ -12,7 +12,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionListener;
 import java.time.LocalDate;
 
 final class NewReservationDialog {
@@ -25,6 +24,7 @@ final class NewReservationDialog {
     private final JTextField phoneNumberTextField = new JTextField(15);
     private final JTextField emailTextField = new JTextField(15);
     private final JButton confirmButton = new JButton("Confirm");
+    private boolean confirmed = false;
 
     NewReservationDialog(Dashboard owner) {
         dialog = new JDialog(owner.getFrame());
@@ -47,26 +47,26 @@ final class NewReservationDialog {
         addRequiredLabel("Name", panel, gbc);
         addRequiredLabel("Surname", panel, gbc);
 
-        gbc.gridy++;
         nameTextField.addCaretListener(e -> validateRequiredFields());
-        panel.add(nameTextField, gbc);
-
         surnameTextField.addCaretListener(e -> validateRequiredFields());
+
+        gbc.gridy++;
+        panel.add(nameTextField, gbc);
         panel.add(surnameTextField, gbc);
 
         gbc.gridy++;
         addRequiredLabel("Date of birth", panel, gbc);
         addRequiredLabel("Evidence ID", panel, gbc);
 
+        birthDateDatePicker.addDateChangeListener(e -> validateRequiredFields());
         gbc.gridy++;
         gbc.ipadx = 12;
         gbc.ipady = 5;
-        birthDateDatePicker.addDateChangeListener(e -> validateRequiredFields());
         panel.add(birthDateDatePicker, gbc);
 
+        evidenceIDTextField.addCaretListener(e -> validateRequiredFields());
         gbc.ipadx = 0;
         gbc.ipady = 10;
-        evidenceIDTextField.addCaretListener(e -> validateRequiredFields());
         panel.add(evidenceIDTextField, gbc);
 
         gbc.gridx = 0;
@@ -80,8 +80,8 @@ final class NewReservationDialog {
         gbc.gridy++;
         addRequiredLabel("Phone Number", panel, gbc);
 
-        gbc.gridy++;
         phoneNumberTextField.addCaretListener(e -> validateRequiredFields());
+        gbc.gridy++;
         panel.add(phoneNumberTextField, gbc);
 
         gbc.gridy++;
@@ -90,11 +90,14 @@ final class NewReservationDialog {
         gbc.gridy++;
         panel.add(emailTextField, gbc);
 
+        confirmButton.setEnabled(false);
+        confirmButton.addActionListener(e -> {
+            confirmed = true;
+            dialog.dispose();
+        });
         gbc.gridy++;
         gbc.insets = new Insets(20, 0, 10, 0);
         gbc.ipady = 0;
-        confirmButton.setEnabled(false);
-        confirmButton.addActionListener(confirmPerformed());
         panel.add(confirmButton, gbc);
 
         dialog.add(panel);
@@ -125,12 +128,6 @@ final class NewReservationDialog {
                         && !phoneNumberTextField.getText().isEmpty());
     }
 
-    private ActionListener confirmPerformed() {
-        return e -> {
-            dialog.dispose();
-        };
-    }
-
     public String getName() {
         return nameTextField.getText();
     }
@@ -153,5 +150,9 @@ final class NewReservationDialog {
 
     public String getEmail() {
         return emailTextField.getText();
+    }
+
+    public boolean isConfirmed() {
+        return confirmed;
     }
 }
