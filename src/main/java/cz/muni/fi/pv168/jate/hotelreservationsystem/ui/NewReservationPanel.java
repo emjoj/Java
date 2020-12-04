@@ -15,9 +15,10 @@ final class NewReservationPanel {
 
     private final JPanel panel;
     private final Dashboard owner;
-    private ValidReservationBlock validReservationBlock;
-    private DatePicker checkinDatePicker = new DatePicker(LocalDate.now(), null);
-    private DatePicker checkoutDatePicker = new DatePicker(LocalDate.now().plusDays(1), null);
+    private final RoomTypesPanel roomTypesPanel;
+    private final DatePicker checkinDatePicker = new DatePicker(LocalDate.now(), null);
+    private final DatePicker checkoutDatePicker = new DatePicker(LocalDate.now().plusDays(1), null);
+    private Person reservationCreator = null;
 
     public NewReservationPanel(Dashboard owner) {
         this.owner = owner;
@@ -31,11 +32,12 @@ final class NewReservationPanel {
         panel.add(createDatePickers(), gbc);
 
         gbc.gridy++;
-        validReservationBlock = new ValidReservationBlock();
-        panel.add(validReservationBlock.getPanel(), gbc);
+        JButton createReservationButton = new JButton("Create reservation");
+        roomTypesPanel = new RoomTypesPanel(createReservationButton);
+        panel.add(roomTypesPanel.getPanel(), gbc);
 
         gbc.gridy++;
-        JButton createReservationButton = new JButton("Create reservation");
+        createReservationButton.setEnabled(false);
         createReservationButton.addActionListener(e -> createReservations());
         panel.add(createReservationButton, gbc);
     }
@@ -67,54 +69,45 @@ final class NewReservationPanel {
         gbc.gridy++;
         gbc.ipady = 5;
         if (label.contains("in")) {
-            checkinDatePicker.addDateChangeListener(e -> {
-                if (checkinDatePicker.getDate() != null) {
-                    checkoutDatePicker.disableUntil(checkinDatePicker.getDate().plusDays(1));
-                }
-                validateDatePickers();
-            });
+            checkinDatePicker.addDateChangeListener(e -> checkinDateChanged());
             panel.add(checkinDatePicker, gbc);
         } else if (label.contains("out")) {
-            checkoutDatePicker.addDateChangeListener(e -> {
-                if (checkoutDatePicker.getDate() != null) {
-                    checkinDatePicker.disableAfter(checkoutDatePicker.getDate().minusDays(1));
-                }
-                validateDatePickers();
-            });
+            checkoutDatePicker.addDateChangeListener(e -> checkoutDateChanged());
             panel.add(checkoutDatePicker, gbc);
         }
 
         return panel;
     }
 
-    private void validateDatePickers() {
-        if (checkinDatePicker.getDate() != null && checkoutDatePicker.getDate() != null) {
-            validReservationBlock.updateRoomTypeLines(getFreeRoomNumbers(
-                    checkinDatePicker.getDate(),
-                    checkoutDatePicker.getDate())
-            );
-        } else {
-            validReservationBlock.getSmallCheckBox().setSelected(false);
-            validReservationBlock.getSmallCheckBox().setEnabled(false);
-            validReservationBlock.getMediumCheckBox().setSelected(false);
-            validReservationBlock.getMediumCheckBox().setEnabled(false);
-            validReservationBlock.getBigCheckBox().setSelected(false);
-            validReservationBlock.getBigCheckBox().setEnabled(false);
-
-            validReservationBlock.getSmallSpinner().setModel(new SpinnerNumberModel(0, 0, null, 1));
-            validReservationBlock.getMediumSpinner().setModel(new SpinnerNumberModel(0, 0, null, 1));
-            validReservationBlock.getBigSpinner().setModel(new SpinnerNumberModel(0, 0, null, 1));
-
-            validReservationBlock.getSmallLabel().setText("max 0");
-            validReservationBlock.getMediumLabel().setText("max 0");
-            validReservationBlock.getBigLabel().setText("max 0");
+    private void checkinDateChanged() {
+        if (checkinDatePicker.getDate() != null) {
+            checkoutDatePicker.disableUntil(checkinDatePicker.getDate().plusDays(1));
         }
+        validateDatePickers();
+    }
+
+    private void checkoutDateChanged() {
+        if (checkoutDatePicker.getDate() != null) {
+            checkinDatePicker.disableAfter(checkoutDatePicker.getDate().minusDays(1));
+        }
+        validateDatePickers();
+    }
+
+    private void validateDatePickers() {
+        roomTypesPanel.updateRoomTypeLines(getFreeRoomNumbers(
+                checkinDatePicker.getDate(),
+                checkoutDatePicker.getDate())
+        );
     }
 
     private List<Long> getFreeRoomNumbers(LocalDate checkinDate, LocalDate checkoutDate) {
-        List<Reservation> currentReservations = owner.getReservationDao().findAll();
-
         List<Long> resultNumbers = new ArrayList<>();
+
+        if (checkinDate == null || checkoutDate == null) {
+            return resultNumbers;
+        }
+
+        List<Reservation> currentReservations = owner.getReservationDao().findAll();
         for (long roomNumber = 1; roomNumber <= 20; roomNumber++) {
             long currentRoomNumber = roomNumber;
 
@@ -125,8 +118,7 @@ final class NewReservationPanel {
             List<Reservation> NonCollidingReservationsForCurrentRoom = reservationsForCurrentRoom.stream()
                     .filter(reservation -> (reservation.getCheckinDate().compareTo(checkinDate) < 0
                             && reservation.getCheckoutDate().compareTo(checkinDate) <= 0)
-                            || (reservation.getCheckinDate().compareTo(checkoutDate) >= 0
-                            && reservation.getCheckoutDate().compareTo(checkinDate) > 0))
+                            || reservation.getCheckinDate().compareTo(checkoutDate) >= 0)
                     .collect(Collectors.toList());
 
             if (NonCollidingReservationsForCurrentRoom.size() == reservationsForCurrentRoom.size()) {
@@ -137,12 +129,37 @@ final class NewReservationPanel {
     }
 
     private void createReservations() {
+        NewReservationDialog personInformation = new NewReservationDialog(owner);
+
+        if ((reservationCreator = initReservationCreator(personInformation)) == null) {
+            return;
+        }
+
+        owner.getPersonDao().create(reservationCreator);
 
         List<Long> freeRoomNumbers = getFreeRoomNumbers(checkinDatePicker.getDate(), checkoutDatePicker.getDate());
 
-        NewReservationDialog personInformation = new NewReservationDialog(owner);
+        createReservationByType(roomTypesPanel.getSmallCheckBox(),
+                roomTypesPanel.getSmallSpinner(),
+                RoomType.SMALL,
+                freeRoomNumbers);
+
+        createReservationByType(roomTypesPanel.getMediumCheckBox(),
+                roomTypesPanel.getMediumSpinner(),
+                RoomType.MEDIUM,
+                freeRoomNumbers);
+
+        createReservationByType(roomTypesPanel.getBigCheckBox(),
+                roomTypesPanel.getBigSpinner(),
+                RoomType.BIG,
+                freeRoomNumbers);
+
+        validateDatePickers();
+    }
+
+    private Person initReservationCreator(NewReservationDialog personInformation) {
         if (personInformation.getName().isEmpty()) {
-            return;
+            return null;
         }
 
         Person person = new Person(
@@ -152,42 +169,40 @@ final class NewReservationPanel {
                 personInformation.getEvidenceID()
         );
         person.setPhoneNumber(personInformation.getPhoneNumber());
+        person.setEmail(personInformation.getEmail().isEmpty() ?
+                null :
+                personInformation.getEmail());
+        return person;
+    }
 
-        owner.getPersonDao().create(person);
-
-        if (validReservationBlock.getSmallCheckBox().isSelected()) {
-            var smallFreeRoomNumbers = freeRoomNumbers.stream()
-                    .filter(number -> number < 8)
-                    .collect(Collectors.toList());
-
-            for (int i = 0; i < (int) validReservationBlock.getSmallSpinner().getValue(); i++) {
-                Room freeRoom = new Room(smallFreeRoomNumbers.get(i), RoomType.SMALL);
-                createReservation(freeRoom, person);
-            }
+    private void createReservationByType(JCheckBox checkBox, JSpinner spinner, RoomType roomType, List<Long> freeRoomNumbers) {
+        if (!checkBox.isSelected()) {
+            return;
         }
 
-        if (validReservationBlock.getMediumCheckBox().isSelected()) {
-            var mediumFreeRoomNumbers = freeRoomNumbers.stream()
-                    .filter(number -> number >= 8 && number < 15)
-                    .collect(Collectors.toList());
-
-            for (int i = 0; i < (int) validReservationBlock.getMediumSpinner().getValue(); i++) {
-                Room freeRoom = new Room(mediumFreeRoomNumbers.get(i), RoomType.MEDIUM);
-                createReservation(freeRoom, person);
-            }
+        List<Long> freeRoomNumbersByType = new ArrayList<>();
+        switch (roomType) {
+            case SMALL:
+                freeRoomNumbersByType = freeRoomNumbers.stream()
+                        .filter(number -> number < 8)
+                        .collect(Collectors.toList());
+                break;
+            case MEDIUM:
+                freeRoomNumbersByType = freeRoomNumbers.stream()
+                        .filter(number -> number >= 8 && number < 15)
+                        .collect(Collectors.toList());
+                break;
+            case BIG:
+                freeRoomNumbersByType = freeRoomNumbers.stream()
+                        .filter(number -> number >= 15 && number <= 20)
+                        .collect(Collectors.toList());
+                break;
         }
 
-        if (validReservationBlock.getBigCheckBox().isSelected()) {
-            var bigFreeRoomNumbers = freeRoomNumbers.stream()
-                    .filter(number -> number >= 15 && number <= 20)
-                    .collect(Collectors.toList());
-
-            for (int i = 0; i < (int) validReservationBlock.getBigSpinner().getValue(); i++) {
-                Room freeRoom = new Room(bigFreeRoomNumbers.get(i), RoomType.BIG);
-                createReservation(freeRoom, person);
-            }
+        for (int i = 0; i < (int) spinner.getValue(); i++) {
+            Room freeRoom = new Room(freeRoomNumbersByType.get(i), roomType);
+            createReservation(freeRoom, reservationCreator);
         }
-        validateDatePickers();
     }
 
     private void createReservation(Room room, Person person) {

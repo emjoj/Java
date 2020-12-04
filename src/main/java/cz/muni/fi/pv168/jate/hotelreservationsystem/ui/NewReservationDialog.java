@@ -94,7 +94,7 @@ final class NewReservationDialog {
         gbc.insets = new Insets(20, 0, 10, 0);
         gbc.ipady = 0;
         confirmButton.setEnabled(false);
-        confirmButton.addActionListener(confirmPerformed());
+        confirmButton.addActionListener(e -> dialog.dispose());
         panel.add(confirmButton, gbc);
 
         dialog.add(panel);
@@ -123,12 +123,6 @@ final class NewReservationDialog {
                         && birthDateDatePicker.getDate() != null
                         && !evidenceIDTextField.getText().isEmpty()
                         && !phoneNumberTextField.getText().isEmpty());
-    }
-
-    private ActionListener confirmPerformed() {
-        return e -> {
-            dialog.dispose();
-        };
     }
 
     public String getName() {
