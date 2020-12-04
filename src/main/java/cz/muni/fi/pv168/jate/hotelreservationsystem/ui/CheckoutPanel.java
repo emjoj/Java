@@ -18,24 +18,17 @@ import static java.time.temporal.ChronoUnit.DAYS;
 
 final class CheckoutPanel {
 
-    JTextField firstNameText;
-    JTextField lastNameText;
-    JTextField roomText;
-    JTextField priceText;
-    JTextField nightsText;
+    private JTextField firstNameText;
+    private JTextField lastNameText;
+    private JTextField roomText;
+    private JTextField priceText;
+    private JTextField nightsText;
 
     private final GridBagConstraints gbc = new GridBagConstraints();
     private final JPanel panel = new JPanel();
     private final JLabel totalCost = new JLabel("0");
     private Dashboard owner;
-    /*
-    private JComboBox<String> roomTypes;
-    private int sumPerNight;
-    private JSpinner nights;
 
-     */
-    //private ReservationDao reservationDao = new ReservationDao();
-    Reservation checkoutRoom;
     Reservation reservation1 = new Reservation(new Person("Alan","Holly",LocalDate.of(1997, 1, 13),"HU9876"),
             new Room((long) 1, RoomType.SMALL), LocalDate.of(2017, 1, 13),LocalDate.of(2017, 1, 15));
 
@@ -51,6 +44,7 @@ final class CheckoutPanel {
 
     CheckoutPanel(Dashboard owner) {
         this.owner = owner;
+        getReservations();
         createReservationsList();
         panel.setLayout(new GridBagLayout());
         panel.setName("Check-out");
@@ -65,6 +59,20 @@ final class CheckoutPanel {
         addCheckoutButton();
     }
 
+    private void getReservations(){
+        owner.getPersonDao().create(new Person("Alan","Holly",LocalDate.of(1997, 1, 13),"HU9876"));
+        owner.getPersonDao().create(new Person("Erik","Cooper",LocalDate.of(1999, 1, 13),"876JOI"));
+        ArrayList<Person> persons = new ArrayList<>(owner.getPersonDao().findAll());
+
+
+
+      //  owner.getReservationDao().create(new Reservation(person,
+       //         new Room((long) 3, RoomType.SMALL), LocalDate.of(2017, 1, 13),LocalDate.of(2017, 1, 25)));
+     //owner.getReservationDao().create(new Reservation(person1,
+        //        new Room((long) 1, RoomType.SMALL), LocalDate.of(2017, 1, 13),LocalDate.of(2017, 1, 15)));
+
+    }
+
     public JPanel getPanel() {
         return panel;
     }
@@ -77,11 +85,31 @@ final class CheckoutPanel {
         createListOfRooms();
     }
 
+    private void createListOfRoomsNew(){
+        List<Long> data = new ArrayList<>();
+        for (Reservation reservation : owner.getReservationDao().findAll()) {
+            data.add(reservation.getRoom().getId());
+        }
+        /*
+        for (Reservation reservation : owner.getReservationDao().findAll()) {
+            if(reservation.getState() == CHECKIN)
+                data.add(reservation.getRoom().getId());
+        }
+
+         */
+    }
+
     private void createListOfRooms(){
+        /*
         List<Long> data = new ArrayList<>();
 
         for(int i=1; i <=20;i ++){
             data.add((long)i);
+        }
+         */
+        List<Long> data = new ArrayList<>();
+        for (Reservation reservation : owner.getReservationDao().findAll()) {
+            data.add(reservation.getRoom().getId());
         }
 
         JList list = new JList(data.toArray());
@@ -97,21 +125,19 @@ final class CheckoutPanel {
         loadData(list);
     }
 
-    private void loadRoomNumber(Object selectedRoomNumber){
+    private Reservation loadRoomNumberInformation(Object selectedRoomNumber){
         for (Reservation reservation : reservations) {
             if (reservation.getRoom().getId().equals((selectedRoomNumber))) {
-                checkoutRoom = reservation;
+                return reservation;
             }
-        }
-
-
+        }return null;
     }
     private void loadData(JList list){
         list.addListSelectionListener(
                 new ListSelectionListener() {
                     @Override
                     public void valueChanged(ListSelectionEvent e) {
-                        loadRoomNumber(list.getSelectedValue());
+                        Reservation checkoutRoom = loadRoomNumberInformation(list.getSelectedValue());
 
                         long nights = DAYS.between(checkoutRoom.getCheckinDate(), checkoutRoom.getCheckoutDate());
                         long pricePerNight = setPrice(checkoutRoom.getRoom().getRoomType());
@@ -132,16 +158,12 @@ final class CheckoutPanel {
         switch (roomType) {
             case SMALL:
                 return 50;
-
             case MEDIUM:
                 return 100;
-
             case BIG:
                 return 150;
-
             default: return 0;
         }
-
     }
 
     private void addTitle(String title) {
@@ -217,6 +239,15 @@ final class CheckoutPanel {
         JButton checkOut = new JButton("Check-out");
         checkOut.addActionListener(e -> {
             // TODO
+            /*
+        Reservation reservation = owner.getReservationDao().findReservationbyId();
+        reservation.setState(CHECKEDOUT);
+
+
+             */
+
+
+
         });
         panel.add(checkOut, gbc);
     }

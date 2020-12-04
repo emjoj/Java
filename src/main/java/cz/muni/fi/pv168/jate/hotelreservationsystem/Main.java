@@ -1,6 +1,7 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem;
 
 import cz.muni.fi.pv168.jate.hotelreservationsystem.data.*;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Person;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.ui.Dashboard;
 import org.apache.derby.jdbc.*;
 
@@ -13,15 +14,24 @@ public class Main {
 
         PersonDao personDao = new PersonDao(dataSource);
         ReservationDao reservationDao = new ReservationDao(dataSource, personDao);
+        PersonGenerator pg = new PersonGenerator();
+        personDao.create(pg.getRandomPerson());
+        personDao.create(pg.getRandomPerson());
+        personDao.create(pg.getRandomPerson());
+        for (Person kek: personDao.findAll()) {
+            System.out.println(kek);
+        }
 
         EventQueue.invokeLater(() -> new Dashboard(personDao, reservationDao).show());
     }
 
     private static EmbeddedDataSource initDataSource() {
         EmbeddedDataSource dataSource = new EmbeddedDataSource();
-        String dbPath = System.getProperty("user.home") + "/hotel-reservation-system";
+        String dbPath = System.getProperty("user.LENOVO") + "/hotel-reservation-system";
         dataSource.setDatabaseName(dbPath);
         dataSource.setCreateDatabase("create");
+
+
 
         return dataSource;
     }
