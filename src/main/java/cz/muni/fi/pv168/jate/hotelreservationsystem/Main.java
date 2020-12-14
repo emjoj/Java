@@ -1,8 +1,10 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem;
 
-import cz.muni.fi.pv168.jate.hotelreservationsystem.data.*;
+
+import cz.muni.fi.pv168.jate.hotelreservationsystem.data.PersonDao;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.data.ReservationDao;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.ui.Dashboard;
-import org.apache.derby.jdbc.*;
+import org.apache.derby.jdbc.EmbeddedDataSource;
 
 import javax.sql.DataSource;
 import java.awt.EventQueue;

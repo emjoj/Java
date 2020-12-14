@@ -92,19 +92,6 @@ public final class Person {
     }
 
     @Override
-    public String toString() {
-        return "Person{" +
-                " firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", birthDate=" + birthDate +
-                ", evidenceID='" + evidence + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", email='" + email + '\'' +
-                ", id=" + id +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -121,5 +108,18 @@ public final class Person {
     @Override
     public int hashCode() {
         return Objects.hash(id, firstName, lastName, birthDate, evidence, phoneNumber, email);
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                " firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", birthDate=" + birthDate +
+                ", evidenceID='" + evidence + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", email='" + email + '\'' +
+                ", id=" + id +
+                '}';
     }
 }
