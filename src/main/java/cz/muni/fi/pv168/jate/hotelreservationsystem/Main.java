@@ -1,15 +1,18 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem;
 
-import cz.muni.fi.pv168.jate.hotelreservationsystem.data.*;
-import cz.muni.fi.pv168.jate.hotelreservationsystem.ui.Dashboard;
-import org.apache.derby.jdbc.*;
 
+import cz.muni.fi.pv168.jate.hotelreservationsystem.data.PersonDao;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.data.ReservationDao;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.ui.Dashboard;
+import org.apache.derby.jdbc.EmbeddedDataSource;
+
+import javax.sql.DataSource;
 import java.awt.EventQueue;
 
 public class Main {
 
     public static void main(String[] args) {
-        EmbeddedDataSource dataSource = initDataSource();
+        DataSource dataSource = initDataSource();
 
         PersonDao personDao = new PersonDao(dataSource);
 
@@ -18,8 +21,8 @@ public class Main {
         EventQueue.invokeLater(() -> new Dashboard(personDao, reservationDao).show());
     }
 
-    private static EmbeddedDataSource initDataSource() {
-        EmbeddedDataSource dataSource = new EmbeddedDataSource();
+    private static DataSource initDataSource() {
+        var dataSource = new EmbeddedDataSource();
         String dbPath = System.getProperty("user.home") + "/hotel-reservation-system";
         dataSource.setDatabaseName(dbPath);
         dataSource.setCreateDatabase("create");

@@ -3,11 +3,12 @@ package cz.muni.fi.pv168.jate.hotelreservationsystem.model;
 public enum ReservationState {
 
     CREATED(1),
-    CHECKEDIN(2),
-    CHECKEDOUT(3);
+    CHECKED_IN(2),
+    CHECKED_OUT(3);
 
     private final int value;
-    private ReservationState(int value) {
+
+    ReservationState(int value) {
         this.value = value;
     }
 
@@ -20,9 +21,9 @@ public enum ReservationState {
             case 1:
                 return CREATED;
             case 2:
-                return CHECKEDIN;
+                return CHECKED_IN;
             default:
-                return CHECKEDOUT;
+                return CHECKED_OUT;
         }
     }
 }

@@ -111,7 +111,7 @@ final class CheckoutPanel {
     public void getCheckedInReservations() {
         List<Long> data = new ArrayList<>();
 
-        for (Reservation reservation : owner.getReservationDao().findbyState(ReservationState.CHECKEDIN)) {
+        for (Reservation reservation : owner.getReservationDao().findbyState(ReservationState.CHECKED_IN)) {
             data.add(reservation.getRoom().getId());
         }
         if (data.isEmpty()) {
@@ -202,10 +202,10 @@ final class CheckoutPanel {
         gbc.anchor = GridBagConstraints.CENTER;
 
         checkOutButton.addActionListener(e -> {
-            for (Reservation reservation : owner.getReservationDao().findbyState(ReservationState.CHECKEDIN)) {
+            for (Reservation reservation : owner.getReservationDao().findbyState(ReservationState.CHECKED_IN)) {
 
                 if (reservation.getRoom().getId().equals((checkoutRoom.getRoom().getId()))) {
-                    reservation.setState(ReservationState.CHECKEDOUT);
+                    reservation.setState(ReservationState.CHECKED_OUT);
                     owner.getReservationDao().updateReservation(reservation);
                 }
             }

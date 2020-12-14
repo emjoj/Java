@@ -1,6 +1,5 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.data;
 
-import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Person;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Reservation;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.ReservationState;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Room;
@@ -13,7 +12,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 final class ReservationDaoTest {
@@ -34,16 +32,21 @@ final class ReservationDaoTest {
         reservationDao = new ReservationDao(dataSource);
     }
 
+    @AfterEach
+    void cleanUp() {
+        reservationDao.dropTable();
+        personDao.dropTable();
+    }
+
     @Test
     void createReservation() {
-        var tomik = new Person("Tomík", "Drobík",
-                LocalDate.of(1998,1, 20), "123456789kek");
+        var person = PersonGenerator.getRandomPerson();
         var room = new Room(1L, RoomType.SMALL);
-        var reservation = new Reservation(tomik, room,
-                LocalDate.of(1996,1, 20),
-                LocalDate.of(1998,1, 20));
+        var reservation = new Reservation(person, room,
+                LocalDate.of(1996, 1, 20),
+                LocalDate.of(1998, 1, 20));
 
-        personDao.create(tomik);
+        personDao.create(person);
         reservationDao.create(reservation);
 
         assertThat(reservation.getId())
@@ -55,78 +58,71 @@ final class ReservationDaoTest {
 
     @Test
     void findByID() {
-        var tomik = new Person("Tomík", "Drobík",
-                LocalDate.of(1998,1, 20), "123456789kek");
+        var person = PersonGenerator.getRandomPerson();
         var room = new Room(1L, RoomType.SMALL);
-        var reservation = new Reservation(tomik, room,
-                LocalDate.of(1996,1, 20),
-                LocalDate.of(1998,1, 20));
-        personDao.create(tomik);
+        var reservation = new Reservation(person, room,
+                LocalDate.of(1996, 1, 20),
+                LocalDate.of(1998, 1, 20));
+        personDao.create(person);
         reservationDao.create(reservation);
-        assertThat(tomik.getId())
+        assertThat(person.getId())
                 .isNotNull();
-        assertThat(reservationDao.findByID(tomik.getId())).isEqualTo(reservation);
+        assertThat(reservationDao.findByID(person.getId()))
+                .isEqualTo(reservation);
     }
 
     @Test
     void updateReservation() {
-        PersonGenerator pg = new PersonGenerator();
-        var boi = pg.getRandomPerson();
+        var person = PersonGenerator.getRandomPerson();
         var room = new Room(1L, RoomType.SMALL);
-        var reservation = new Reservation(boi, room,
-                LocalDate.of(2000,1, 20),
-                LocalDate.of(2002,1, 20),
+        var reservation = new Reservation(person, room,
+                LocalDate.of(2000, 1, 20),
+                LocalDate.of(2002, 1, 20),
                 ReservationState.CREATED);
-        personDao.create(boi);
+        personDao.create(person);
         reservationDao.create(reservation);
-        reservation.setState(ReservationState.CHECKEDIN);
+        reservation.setState(ReservationState.CHECKED_IN);
         reservationDao.updateReservation(reservation);
-        assertThat(reservationDao.findByID(reservation.getId())).isEqualTo(reservation);
+        assertThat(reservationDao.findByID(reservation.getId()))
+                .isEqualTo(reservation);
     }
 
     @Test
     void findByState() {
-        PersonGenerator pg = new PersonGenerator();
-        var boi = pg.getRandomPerson();
-        var kek = pg.getRandomPerson();
-        var kekito = pg.getRandomPerson();
-        var ripito = pg.getRandomPerson();
+        var person1 = PersonGenerator.getRandomPerson();
+        var person2 = PersonGenerator.getRandomPerson();
+        var person3 = PersonGenerator.getRandomPerson();
+        var person4 = PersonGenerator.getRandomPerson();
 
         var room1 = new Room(1L, RoomType.SMALL);
         var room2 = new Room(2L, RoomType.SMALL);
         var room3 = new Room(3L, RoomType.SMALL);
         var room4 = new Room(4L, RoomType.SMALL);
-        var badreservation1 = new Reservation(boi, room1,
-                LocalDate.of(2000,1, 20),
-                LocalDate.of(2002,1, 20),
+        var badreservation1 = new Reservation(person1, room1,
+                LocalDate.of(2000, 1, 20),
+                LocalDate.of(2002, 1, 20),
                 ReservationState.CREATED);
-        var goodreservation1 = new Reservation(boi, room2,
-                LocalDate.of(2000,1, 20),
-                LocalDate.of(2002,1, 20),
-                ReservationState.CHECKEDIN);
-        var goodreservation2 = new Reservation(boi, room3,
-                LocalDate.of(2000,1, 20),
-                LocalDate.of(2002,1, 20),
-                ReservationState.CHECKEDIN);
-        var badreservation2 = new Reservation(boi, room4,
-                LocalDate.of(2000,1, 20),
-                LocalDate.of(2002,1, 20),
-                ReservationState.CHECKEDOUT);
-        personDao.create(boi);
-        personDao.create(kek);
-        personDao.create(kekito);
-        personDao.create(ripito);
+        var goodreservation1 = new Reservation(person1, room2,
+                LocalDate.of(2000, 1, 20),
+                LocalDate.of(2002, 1, 20),
+                ReservationState.CHECKED_IN);
+        var goodreservation2 = new Reservation(person1, room3,
+                LocalDate.of(2000, 1, 20),
+                LocalDate.of(2002, 1, 20),
+                ReservationState.CHECKED_IN);
+        var badreservation2 = new Reservation(person1, room4,
+                LocalDate.of(2000, 1, 20),
+                LocalDate.of(2002, 1, 20),
+                ReservationState.CHECKED_OUT);
+        personDao.create(person1);
+        personDao.create(person2);
+        personDao.create(person3);
+        personDao.create(person4);
         reservationDao.create(badreservation1);
         reservationDao.create(badreservation2);
         reservationDao.create(goodreservation1);
         reservationDao.create(goodreservation2);
-        assertThat(reservationDao.findbyState(ReservationState.CHECKEDIN))
+        assertThat(reservationDao.findbyState(ReservationState.CHECKED_IN))
                 .containsExactlyInAnyOrder(goodreservation1, goodreservation2);
-    }
-
-    @AfterEach
-    void cleanUp() {
-        reservationDao.dropTable();
-        personDao.dropTable();
     }
 }

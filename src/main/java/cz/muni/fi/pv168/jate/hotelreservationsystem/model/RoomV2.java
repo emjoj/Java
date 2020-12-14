@@ -2,12 +2,12 @@ package cz.muni.fi.pv168.jate.hotelreservationsystem.model;
 
 import java.util.Objects;
 
-public final class Room {
+public class RoomV2 {
 
     private long id;
-    private RoomType roomType;
+    private RoomTypeV2 roomType;
 
-    public Room(Long id, RoomType roomType) {
+    public RoomV2(Long id, RoomTypeV2 roomType) {
         this.id = id;
         this.roomType = roomType;
     }
@@ -16,7 +16,7 @@ public final class Room {
         return id;
     }
 
-    public RoomType getRoomType() {
+    public RoomTypeV2 getRoomTypeV2() {
         return roomType;
     }
 
@@ -24,7 +24,7 @@ public final class Room {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Room room = (Room) o;
+        RoomV2 room = (RoomV2) o;
         return id == room.id;
     }
 

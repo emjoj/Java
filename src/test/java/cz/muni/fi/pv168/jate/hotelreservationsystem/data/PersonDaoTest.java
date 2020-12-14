@@ -1,13 +1,10 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.data;
 
-import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Person;
 import org.apache.derby.jdbc.EmbeddedDataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,6 +23,7 @@ final class PersonDaoTest {
     void createPersonDao() {
         personDao = new PersonDao(dataSource);
     }
+
     @AfterEach
     void cleanUp() {
         personDao.dropTable();
@@ -33,13 +31,30 @@ final class PersonDaoTest {
 
     @Test
     void createPerson() {
-        var tomik = new Person("Tomík", "Drobík",
-                LocalDate.of(1998,1, 20), "123456789kek");
-        personDao.create(tomik);
+        var person = PersonGenerator.getRandomPerson();
+        personDao.create(person);
 
-        assertThat(tomik.getId())
+        assertThat(person.getId())
                 .isNotNull();
-        assertThat(personDao.findAll()).containsExactly(tomik);
+        assertThat(personDao.findAll()).containsExactly(person);
+    }
+
+    @Test
+    void findByEvidence() {
+        var person = PersonGenerator.getRandomPerson();
+        personDao.create(person);
+
+        assertThat(personDao.findByEvidence(person.getEvidence()))
+                .isEqualTo(person);
+    }
+
+    @Test
+    void findById() {
+        var person = PersonGenerator.getRandomPerson();
+        personDao.create(person);
+
+        assertThat(personDao.findById(person.getId()))
+                .isEqualTo(person);
     }
 
 }

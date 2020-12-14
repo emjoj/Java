@@ -11,11 +11,11 @@ import java.util.List;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
-public class PersonDao {
+public final class PersonDao {
 
     private final DataSource dataSource;
 
-    public PersonDao(DataSource dataSource){
+    public PersonDao(DataSource dataSource) {
         this.dataSource = dataSource;
         initTable();
     }
@@ -31,7 +31,7 @@ public class PersonDao {
             st.setString(1, person.getFirstName());
             st.setString(2, person.getLastName());
             st.setDate(3, Date.valueOf(person.getBirthDate()));
-            st.setString(4, person.getEvidenceID());
+            st.setString(4, person.getEvidence());
             st.setString(5, person.getEmail());
             st.setString(6, person.getPhoneNumber());
 
@@ -88,19 +88,24 @@ public class PersonDao {
             throw new DataAccessException("Failed to load all persons", ex);
         }
     }
-    // returns null if person not in database
-    public Person findByID(Long ID) {
+
+    /**
+     * @return {@code null} if person is not in the database
+     */
+    public Person findById(Long id) {
         try (var connection = dataSource.getConnection();
              var st = connection.prepareStatement("SELECT ID, FIRST_NAME, LAST_NAME, BIRTH_DATE," +
                      " EVIDENCE, EMAIL, PHONE_NUMBER FROM PERSON WHERE ID = ?")) {
-            st.setLong(1, ID);
+            st.setLong(1, id);
             return getPerson(st);
         } catch (SQLException ex) {
             throw new DataAccessException("Failed to find person by ID", ex);
         }
     }
 
-    // returns null if person not in database
+    /**
+     * @return {@code null} if person is not in the database
+     */
     public Person findByEvidence(String evidence) {
         try (var connection = dataSource.getConnection();
              var st = connection.prepareStatement("SELECT ID, FIRST_NAME, LAST_NAME, BIRTH_DATE," +
