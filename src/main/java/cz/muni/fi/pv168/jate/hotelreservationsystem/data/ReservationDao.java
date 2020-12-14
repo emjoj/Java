@@ -15,7 +15,7 @@ import java.util.List;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
-public class ReservationDao {
+public final class ReservationDao {
     private final DataSource dataSource;
 
     public ReservationDao(DataSource dataSource) {

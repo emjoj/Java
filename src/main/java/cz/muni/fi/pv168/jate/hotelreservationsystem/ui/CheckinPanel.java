@@ -227,7 +227,7 @@ final class CheckinPanel {
 
     private void checkinWithoutPriorReservation(Person person) {
         Reservation reservation = new Reservation(person, new Room(getRoomNumber(), (RoomType) roomTypes.getSelectedItem()),
-                getCheckinDate(), getCheckoutDate(), ReservationState.CHECKEDIN);
+                getCheckinDate(), getCheckoutDate(), ReservationState.CHECKED_IN);
         owner.getReservationDao().create(reservation);
         updateRoomTypes(getFreeRoomNumbers(checkinDatePicker.getDate(), checkoutDatePicker.getDate()));
         owner.getReservationDao().updateReservation(reservation);
@@ -245,7 +245,7 @@ final class CheckinPanel {
     private void validateFieldsWhenPriorReservationCreated() {
         Long reservationID = getReservationID();
         Reservation reservation = owner.getReservationDao().findByID(reservationID);
-        reservation.setState(ReservationState.CHECKEDIN);
+        reservation.setState(ReservationState.CHECKED_IN);
         owner.getReservationDao().updateReservation(reservation);
 
         checkinDatePicker.setDate(reservation.getCheckinDate());
