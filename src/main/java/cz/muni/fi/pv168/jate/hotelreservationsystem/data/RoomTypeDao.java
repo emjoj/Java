@@ -15,7 +15,6 @@ public class RoomTypeDao {
     public RoomTypeDao(DataSource dataSource) {
         this.dataSource = dataSource;
         initTable();
-        fillTable();
     }
 
     public void create(RoomTypeV2 roomType) {
@@ -37,6 +36,7 @@ public class RoomTypeDao {
     private void initTable() {
         if (!tableExists("ROOM_TYPE")) {
             createTable();
+            fillTable();
         }
     }
 
@@ -55,7 +55,7 @@ public class RoomTypeDao {
              var rs = connection.getMetaData().getTables(null, null, tableName, null)) {
             return rs.next();
         } catch (SQLException ex) {
-            throw new DataAccessException("Failed to detect if the table " + tableName + " exist", ex);
+            throw new DataAccessException("Failed to detect if the table " + tableName + " exists", ex);
         }
     }
 
