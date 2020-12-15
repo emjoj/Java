@@ -4,12 +4,14 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 public final class Reservation {
+
     private Long id;
     private Person owner;
     private Room room;
     private LocalDate checkinDate;
     private LocalDate checkoutDate;
     private ReservationState state;
+    private RoomV2 roomV2 = null;
 
     public Reservation(Person owner, Room room, LocalDate checkinDate, LocalDate checkoutDate) {
         this.owner = owner;
@@ -25,6 +27,14 @@ public final class Reservation {
         this.checkinDate = checkinDate;
         this.checkoutDate = checkoutDate;
         this.state = state;
+    }
+
+    public RoomV2 getRoomV2() {
+        return roomV2;
+    }
+
+    public void setRoomV2(RoomV2 roomV2) {
+        this.roomV2 = roomV2;
     }
 
     public Long getId() {
@@ -84,13 +94,14 @@ public final class Reservation {
                 Objects.equals(owner, that.owner) &&
                 Objects.equals(room, that.room) &&
                 Objects.equals(checkinDate, that.checkinDate) &&
-                Objects.equals(checkoutDate, that.checkoutDate)&&
-                Objects.equals(state, that.state);
+                Objects.equals(checkoutDate, that.checkoutDate) &&
+                state == that.state &&
+                Objects.equals(roomV2, that.roomV2);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, owner, room, checkinDate, checkoutDate, state);
+        return Objects.hash(id, owner, room, checkinDate, checkoutDate, state, roomV2);
     }
 
     @Override
@@ -101,6 +112,7 @@ public final class Reservation {
                 ", checkinDate=" + checkinDate +
                 ", checkoutDate=" + checkoutDate +
                 ", id=" + id +
+                ", roomId=" + roomV2 +
                 '}';
     }
 }

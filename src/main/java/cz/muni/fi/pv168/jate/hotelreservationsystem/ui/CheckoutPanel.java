@@ -206,7 +206,7 @@ final class CheckoutPanel {
 
                 if (reservation.getRoom().getId().equals((checkoutRoom.getRoom().getId()))) {
                     reservation.setState(ReservationState.CHECKED_OUT);
-                    owner.getReservationDao().updateReservation(reservation);
+                    owner.getReservationDao().update(reservation);
                 }
             }
             resetAllCells();

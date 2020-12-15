@@ -4,15 +4,15 @@ import java.util.Objects;
 
 public class RoomV2 {
 
-    private int id;
+    private long id;
     private RoomTypeV2 roomType;
 
-    public RoomV2(int id, RoomTypeV2 roomType) {
+    public RoomV2(long id, RoomTypeV2 roomType) {
         this.id = id;
         this.roomType = roomType;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

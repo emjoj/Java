@@ -1,7 +1,6 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.data;
 
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.BedType;
-import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Room;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomTypeName;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomTypeV2;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomV2;
@@ -10,7 +9,7 @@ import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 
-public class RoomDao {
+public final class RoomDao {
 
     private DataSource dataSource;
 
@@ -24,12 +23,40 @@ public class RoomDao {
              var st = connection.prepareStatement(
                      "INSERT INTO ROOM (ID, ROOM_TYPE_NAME) VALUES (?, ?)"
              )) {
-            st.setInt(1, room.getId());
+            st.setLong(1, room.getId());
             st.setString(2, room.getRoomTypeV2().getRoomTypeName().name());
 
             st.executeUpdate();
         } catch (SQLException ex) {
             throw new DataAccessException("Failed to store room" + room, ex);
+        }
+    }
+
+    public RoomV2 findById(Long id) {
+        try (var connection = dataSource.getConnection();
+             var st = connection.prepareStatement(
+                     "SELECT ID, NAME, BED_COUNT, BED_TYPE, PRICE_PER_NIGHT" +
+                             " FROM ROOM INNER JOIN ROOM_TYPE" +
+                             " ON ROOM_TYPE_NAME = NAME" +
+                             " WHERE ID = ?")) {
+            st.setLong(1, id);
+            RoomV2 roomV2 = null;
+            try (var rs = st.executeQuery()) {
+                while (rs.next()) {
+                    roomV2 = new RoomV2(
+                            rs.getLong("ID"),
+                            new RoomTypeV2(
+                                    RoomTypeName.valueOf(rs.getString("NAME")),
+                                    rs.getInt("BED_COUNT"),
+                                    BedType.valueOf(rs.getString("BED_TYPE")),
+                                    rs.getBigDecimal("PRICE_PER_NIGHT")
+                            )
+                    );
+                }
+            }
+            return roomV2;
+        } catch (SQLException ex) {
+            throw new DataAccessException("Failed to find room " + id + " in the database", ex);
         }
     }
 
@@ -74,8 +101,8 @@ public class RoomDao {
              var st = connection.createStatement()) {
 
             st.executeUpdate("CREATE TABLE ROOM (" +
-                    "ID SMALLINT NOT NULL," +
-                    "ROOM_TYPE_NAME VARCHAR(100) NOT NULL" +
+                    "ID BIGINT PRIMARY KEY," +
+                    "ROOM_TYPE_NAME VARCHAR(100) NOT NULL REFERENCES ROOM_TYPE" +
                     ")");
         } catch (SQLException ex) {
             throw new DataAccessException("Failed to create ROOM table", ex);

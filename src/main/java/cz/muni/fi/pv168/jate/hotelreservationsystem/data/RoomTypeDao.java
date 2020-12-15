@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 
-public class RoomTypeDao {
+public final class RoomTypeDao {
 
     private DataSource dataSource;
 
@@ -21,7 +21,7 @@ public class RoomTypeDao {
         try (var connection = dataSource.getConnection();
              var st = connection.prepareStatement(
                      "INSERT INTO ROOM_TYPE (NAME, BED_COUNT, BED_TYPE, PRICE_PER_NIGHT) VALUES (?, ?, ?, ?)"
-                     )) {
+             )) {
             st.setString(1, roomType.getRoomTypeName().name());
             st.setInt(2, roomType.getBedCount());
             st.setString(3, roomType.getBedType().name());
@@ -64,7 +64,7 @@ public class RoomTypeDao {
              var st = connection.createStatement()) {
 
             st.executeUpdate("CREATE TABLE ROOM_TYPE (" +
-                    "NAME VARCHAR(100) NOT NULL," +
+                    "NAME VARCHAR(100) PRIMARY KEY," +
                     "BED_COUNT SMALLINT NOT NULL," +
                     "BED_TYPE VARCHAR(100) NOT NULL," +
                     "PRICE_PER_NIGHT DECIMAL NOT NULL" +

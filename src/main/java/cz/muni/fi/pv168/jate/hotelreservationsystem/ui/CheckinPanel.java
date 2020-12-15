@@ -230,7 +230,7 @@ final class CheckinPanel {
                 getCheckinDate(), getCheckoutDate(), ReservationState.CHECKED_IN);
         owner.getReservationDao().create(reservation);
         updateRoomTypes(getFreeRoomNumbers(checkinDatePicker.getDate(), checkoutDatePicker.getDate()));
-        owner.getReservationDao().updateReservation(reservation);
+        owner.getReservationDao().update(reservation);
     }
 
     private void checkinWithPriorReservation() {
@@ -246,7 +246,7 @@ final class CheckinPanel {
         Long reservationID = getReservationID();
         Reservation reservation = owner.getReservationDao().findByID(reservationID);
         reservation.setState(ReservationState.CHECKED_IN);
-        owner.getReservationDao().updateReservation(reservation);
+        owner.getReservationDao().update(reservation);
 
         checkinDatePicker.setDate(reservation.getCheckinDate());
         checkoutDatePicker.setDate(reservation.getCheckoutDate());
