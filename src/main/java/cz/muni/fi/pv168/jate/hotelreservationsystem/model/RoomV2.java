@@ -7,12 +7,12 @@ public class RoomV2 {
     private long id;
     private RoomTypeV2 roomType;
 
-    public RoomV2(Long id, RoomTypeV2 roomType) {
+    public RoomV2(long id, RoomTypeV2 roomType) {
         this.id = id;
         this.roomType = roomType;
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
@@ -31,5 +31,12 @@ public class RoomV2 {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "RoomV2{" +
+                "id=" + id +
+                '}';
     }
 }

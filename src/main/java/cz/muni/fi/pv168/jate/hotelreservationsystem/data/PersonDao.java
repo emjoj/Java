@@ -160,6 +160,5 @@ public final class PersonDao {
         } catch (SQLException ex) {
             throw new DataAccessException("Failed to drop PERSON table", ex);
         }
-
     }
 }
