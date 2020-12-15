@@ -3,6 +3,7 @@ package cz.muni.fi.pv168.jate.hotelreservationsystem;
 
 import cz.muni.fi.pv168.jate.hotelreservationsystem.data.PersonDao;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.data.ReservationDao;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.data.RoomTypeDao;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.ui.Dashboard;
 import org.apache.derby.jdbc.EmbeddedDataSource;
 
@@ -17,6 +18,8 @@ public class Main {
         PersonDao personDao = new PersonDao(dataSource);
 
         ReservationDao reservationDao = new ReservationDao(dataSource);
+
+        RoomTypeDao roomTypeDao = new RoomTypeDao(dataSource);
 
         EventQueue.invokeLater(() -> new Dashboard(personDao, reservationDao).show());
     }

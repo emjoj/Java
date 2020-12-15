@@ -62,4 +62,14 @@ public class RoomTypeV2 {
     public int hashCode() {
         return Objects.hash(roomTypeName);
     }
+
+    @Override
+    public String toString() {
+        return "RoomTypeV2{" +
+                "roomTypeName=" + roomTypeName +
+                ", bedCount=" + bedCount +
+                ", bedType=" + bedType +
+                ", pricePerNight=" + pricePerNight +
+                '}';
+    }
 }

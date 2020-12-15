@@ -122,7 +122,7 @@ final class ReservationDaoTest {
         reservationDao.create(badreservation2);
         reservationDao.create(goodreservation1);
         reservationDao.create(goodreservation2);
-        assertThat(reservationDao.findbyState(ReservationState.CHECKED_IN))
+        assertThat(reservationDao.findByState(ReservationState.CHECKED_IN))
                 .containsExactlyInAnyOrder(goodreservation1, goodreservation2);
     }
 }

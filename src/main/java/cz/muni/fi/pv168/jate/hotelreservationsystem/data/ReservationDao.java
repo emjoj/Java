@@ -133,7 +133,7 @@ public final class ReservationDao {
         }
     }
 
-    public List<Reservation> findbyState(ReservationState state) {
+    public List<Reservation> findByState(ReservationState state) {
         try (var connection = dataSource.getConnection();
              var st = connection.prepareStatement("SELECT R.ID, OWNER_ID, ROOM_ID, CHECKIN, CHECKOUT, STATE," +
                      " FIRST_NAME, LAST_NAME, BIRTH_DATE," +
