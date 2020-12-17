@@ -2,19 +2,9 @@ package cz.muni.fi.pv168.jate.hotelreservationsystem.model;
 
 public enum ReservationState {
 
-    CREATED(1),
-    CHECKED_IN(2),
-    CHECKED_OUT(3);
-
-    private final int value;
-
-    ReservationState(int value) {
-        this.value = value;
-    }
-
-    public int getValue() {
-        return value;
-    }
+    CREATED(),
+    CHECKED_IN(),
+    CHECKED_OUT();
 
     public static ReservationState getState(int value) {
         switch (value) {

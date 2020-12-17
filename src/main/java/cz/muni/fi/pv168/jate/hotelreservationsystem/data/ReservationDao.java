@@ -141,7 +141,7 @@ public final class ReservationDao {
             st.setString(1, state.name());
             return getReservations(st);
         } catch (SQLException ex) {
-            throw new DataAccessException("Failed to load all reservations", ex);
+            throw new DataAccessException("Failed to find reservations by state: " + state, ex);
         }
     }
 
