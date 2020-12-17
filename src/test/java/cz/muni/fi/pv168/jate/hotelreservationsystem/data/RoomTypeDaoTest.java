@@ -4,6 +4,7 @@ import org.apache.derby.jdbc.EmbeddedDataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 final class RoomTypeDaoTest {
     private static EmbeddedDataSource dataSource;

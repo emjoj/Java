@@ -1,6 +1,7 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.data;
 
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.BedType;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Room;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomTypeName;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomTypeV2;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomV2;
@@ -8,6 +9,8 @@ import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomV2;
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class RoomDao {
 
@@ -57,6 +60,49 @@ public final class RoomDao {
             return roomV2;
         } catch (SQLException ex) {
             throw new DataAccessException("Failed to find room " + id + " in the database", ex);
+        }
+    }
+
+    public List<RoomV2> findAll() {
+        try (var connection = dataSource.getConnection();
+             var st = connection.prepareStatement(
+                     "SELECT ID, NAME, BED_COUNT, BED_TYPE, PRICE_PER_NIGHT" +
+                             " FROM ROOM INNER JOIN ROOM_TYPE" +
+                             " ON ROOM_TYPE_NAME = NAME")) {
+            List<RoomV2> returnList = new ArrayList<RoomV2>();
+            try (var rs = st.executeQuery()) {
+                while (rs.next()) {
+                    var roomV2 = new RoomV2(
+                            rs.getLong("ID"),
+                            new RoomTypeV2(
+                                    RoomTypeName.valueOf(rs.getString("NAME")),
+                                    rs.getInt("BED_COUNT"),
+                                    BedType.valueOf(rs.getString("BED_TYPE")),
+                                    rs.getBigDecimal("PRICE_PER_NIGHT")
+                            )
+                    );
+                    returnList.add(roomV2);
+                }
+            }
+            return returnList;
+        } catch (SQLException ex) {
+            throw new DataAccessException("Failed to get all rooms", ex);
+        }
+    }
+
+    public Long countRooms() {
+        try (var connection = dataSource.getConnection();
+             var st = connection.prepareStatement(
+                     "SELECT COUNT(*)" +
+                             " FROM ROOM")) {
+            try (var rs = st.executeQuery()) {
+                while (rs.next()) {
+                    return rs.getLong(1);
+                }
+            }
+            return 0L;
+        } catch (SQLException ex) {
+            throw new DataAccessException("Failed to get all rooms", ex);
         }
     }
 
