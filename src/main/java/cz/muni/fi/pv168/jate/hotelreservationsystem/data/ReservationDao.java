@@ -14,10 +14,10 @@ import javax.sql.DataSource;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.time.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.*;
+import java.util.stream.Collectors;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
