@@ -18,10 +18,11 @@ public class Main {
 
         PersonDao personDao = new PersonDao(dataSource);
 
-        ReservationDao reservationDao = new ReservationDao(dataSource);
-
         RoomTypeDao roomTypeDao = new RoomTypeDao(dataSource);
+
         RoomDao roomDao = new RoomDao(dataSource);
+
+        ReservationDao reservationDao = new ReservationDao(dataSource);
 
         EventQueue.invokeLater(() -> new Dashboard(personDao, reservationDao).show());
     }
