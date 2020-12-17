@@ -90,6 +90,22 @@ public final class RoomDao {
         }
     }
 
+    public Long countRooms() {
+        try (var connection = dataSource.getConnection();
+             var st = connection.prepareStatement(
+                     "SELECT COUNT(*)" +
+                             " FROM ROOM")) {
+            try (var rs = st.executeQuery()) {
+                while (rs.next()) {
+                    return rs.getLong(1);
+                }
+            }
+            return 0L;
+        } catch (SQLException ex) {
+            throw new DataAccessException("Failed to get all rooms", ex);
+        }
+    }
+
     private void initTable() {
         if (!tableExists("ROOM")) {
             createTable();

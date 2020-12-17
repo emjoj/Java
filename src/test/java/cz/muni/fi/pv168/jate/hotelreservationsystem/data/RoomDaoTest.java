@@ -63,4 +63,10 @@ final class RoomDaoTest {
         assertThat(roomDao.findAll())
                 .isEqualTo(list);
     }
+
+    @Test
+    void countRooms() {
+        assertThat(roomDao.countRooms())
+                .isEqualTo(20L);
+    }
 }
