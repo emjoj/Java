@@ -14,8 +14,10 @@ import javax.sql.DataSource;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.*;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
@@ -239,5 +241,41 @@ public final class ReservationDao {
         } catch (SQLException ex) {
             throw new DataAccessException("Failed to create RESERVATION table", ex);
         }
+    }
+
+    /**
+     * Get room numbers of rooms that are not occupied in the given time period.
+     *
+     * @param checkinDate check-in date
+     * @param checkoutDate check-out date
+     * @return room numbers of free rooms
+     */
+    public List<Long> getFreeRoomNumbers(LocalDate checkinDate, LocalDate checkoutDate) {
+        List<Long> freeRoomNumbers = new ArrayList<>();
+
+        if (checkinDate == null || checkoutDate == null) {
+            return freeRoomNumbers;
+        }
+
+        var groupByRoomNumber = findAll().stream()
+                .collect(Collectors.groupingBy(reservation -> reservation.getRoomV2().getId()));
+
+        for (var entry : groupByRoomNumber.entrySet()) {
+            var reservationsForCurrentRoom = entry.getValue();
+
+            var nonCollidingReservationsForCurrentRoom = reservationsForCurrentRoom.stream()
+                    .filter(reservation ->
+                            // Reservations that end on check-in date at the latest.
+                            (reservation.getCheckinDate().compareTo(checkinDate) < 0 && reservation.getCheckoutDate().compareTo(checkinDate) <= 0)
+                            // Reservation that start on check-out date at the earliest.
+                            || reservation.getCheckinDate().compareTo(checkoutDate) >= 0)
+                    .collect(Collectors.toList());
+
+            if (reservationsForCurrentRoom.size() == nonCollidingReservationsForCurrentRoom.size()) {
+                Long currentRoomNumber = entry.getKey();
+                freeRoomNumbers.add(currentRoomNumber);
+            }
+        }
+        return freeRoomNumbers;
     }
 }
