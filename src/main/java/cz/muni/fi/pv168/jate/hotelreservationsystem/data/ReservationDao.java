@@ -17,7 +17,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
@@ -244,38 +244,43 @@ public final class ReservationDao {
     }
 
     /**
-     * Get room numbers of rooms that are not occupied in the given time period.
-     *
      * @param checkinDate check-in date
      * @param checkoutDate check-out date
-     * @return room numbers of free rooms
+     * @return rooms that are not occupied in the given time period
      */
-    public List<Long> getFreeRoomNumbers(LocalDate checkinDate, LocalDate checkoutDate) {
-        List<Long> freeRoomNumbers = new ArrayList<>();
+    public List<RoomV2> getFreeRooms(LocalDate checkinDate, LocalDate checkoutDate) {
+        List<RoomV2> freeRooms = new ArrayList<>();
 
         if (checkinDate == null || checkoutDate == null) {
-            return freeRoomNumbers;
+            return freeRooms;
         }
 
-        var groupByRoomNumber = findAll().stream()
-                .collect(Collectors.groupingBy(reservation -> reservation.getRoomV2().getId()));
+        var createdReservations = findByState(ReservationState.CREATED);
+        var checkedInReservations = findByState(ReservationState.CHECKED_IN);
 
-        for (var entry : groupByRoomNumber.entrySet()) {
+        var reservations = Stream
+                .concat(createdReservations.stream(), checkedInReservations.stream())
+                .collect(Collectors.toList());
+
+        var groupByRoom = reservations.stream()
+                .collect(Collectors.groupingBy(Reservation::getRoomV2));
+
+        for (var entry : groupByRoom.entrySet()) {
             var reservationsForCurrentRoom = entry.getValue();
 
             var nonCollidingReservationsForCurrentRoom = reservationsForCurrentRoom.stream()
                     .filter(reservation ->
                             // Reservations that end on check-in date at the latest.
-                            (reservation.getCheckinDate().compareTo(checkinDate) < 0 && reservation.getCheckoutDate().compareTo(checkinDate) <= 0)
+                            reservation.getCheckoutDate().compareTo(checkinDate) <= 0
                             // Reservation that start on check-out date at the earliest.
                             || reservation.getCheckinDate().compareTo(checkoutDate) >= 0)
                     .collect(Collectors.toList());
 
             if (reservationsForCurrentRoom.size() == nonCollidingReservationsForCurrentRoom.size()) {
-                Long currentRoomNumber = entry.getKey();
-                freeRoomNumbers.add(currentRoomNumber);
+                RoomV2 currentRoom = entry.getKey();
+                freeRooms.add(currentRoom);
             }
         }
-        return freeRoomNumbers;
+        return freeRooms;
     }
 }
