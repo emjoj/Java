@@ -22,7 +22,7 @@ public class Main {
 
         RoomDao roomDao = new RoomDao(dataSource);
 
-        ReservationDao reservationDao = new ReservationDao(dataSource);
+        ReservationDao reservationDao = new ReservationDao(dataSource, roomDao);
 
         EventQueue.invokeLater(() -> new Dashboard(personDao, reservationDao).show());
     }

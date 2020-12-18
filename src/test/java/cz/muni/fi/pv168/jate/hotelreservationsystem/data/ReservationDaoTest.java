@@ -1,13 +1,6 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.data;
 
-import cz.muni.fi.pv168.jate.hotelreservationsystem.model.BedType;
-import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Reservation;
-import cz.muni.fi.pv168.jate.hotelreservationsystem.model.ReservationState;
-import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Room;
-import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomType;
-import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomTypeName;
-import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomTypeV2;
-import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomV2;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.*;
 import org.apache.derby.jdbc.EmbeddedDataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -38,7 +31,7 @@ final class ReservationDaoTest {
         personDao = new PersonDao(dataSource);
         roomTypeDao = new RoomTypeDao(dataSource);
         roomDao = new RoomDao(dataSource);
-        reservationDao = new ReservationDao(dataSource);
+        reservationDao = new ReservationDao(dataSource, roomDao);
     }
 
     @AfterEach
@@ -147,5 +140,31 @@ final class ReservationDaoTest {
         reservationDao.create(goodReservation2);
         assertThat(reservationDao.findByState(ReservationState.CHECKED_IN))
                 .containsExactlyInAnyOrder(goodReservation1, goodReservation2);
+    }
+
+    @Test
+    void getFreeRooms() {
+        LocalDate today = LocalDate.now();
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+
+        assertThat(reservationDao.getFreeRooms(today, tomorrow)).isNotEmpty();
+
+        Person person = PersonGenerator.getRandomPerson();
+        personDao.create(person);
+
+        var rooms = roomDao.findAll();
+        for (int index = 0; index < rooms.size(); index++) {
+            var room1 = new Room(rooms.get(index).getId(), RoomType.SMALL); // TODO will be removed
+
+            Reservation reservation = new Reservation(person, room1, today, tomorrow);
+            reservation.setRoomV2(rooms.get(index));
+            reservationDao.create(reservation);
+
+            if (index == rooms.size() - 1) {
+                break;
+            }
+            assertThat(reservationDao.getFreeRooms(today, tomorrow)).isNotEmpty();
+        }
+        assertThat(reservationDao.getFreeRooms(today, tomorrow)).isEmpty();
     }
 }
