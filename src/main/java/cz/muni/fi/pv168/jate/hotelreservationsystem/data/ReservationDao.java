@@ -24,9 +24,11 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 public final class ReservationDao {
 
     private final DataSource dataSource;
+    private RoomDao roomDao;
 
-    public ReservationDao(DataSource dataSource) {
+    public ReservationDao(DataSource dataSource, RoomDao roomDao) {
         this.dataSource = dataSource;
+        this.roomDao = roomDao;
         initTable();
     }
 
@@ -265,8 +267,14 @@ public final class ReservationDao {
         var groupByRoom = reservations.stream()
                 .collect(Collectors.groupingBy(Reservation::getRoomV2));
 
-        for (var entry : groupByRoom.entrySet()) {
-            var reservationsForCurrentRoom = entry.getValue();
+        for (RoomV2 room : roomDao.findAll()) {
+            var reservationsForCurrentRoom = groupByRoom.get(room);
+
+            // No reservations for room.
+            if (reservationsForCurrentRoom == null) {
+                freeRooms.add(room);
+                continue;
+            }
 
             var nonCollidingReservationsForCurrentRoom = reservationsForCurrentRoom.stream()
                     .filter(reservation ->
@@ -277,10 +285,10 @@ public final class ReservationDao {
                     .collect(Collectors.toList());
 
             if (reservationsForCurrentRoom.size() == nonCollidingReservationsForCurrentRoom.size()) {
-                RoomV2 currentRoom = entry.getKey();
-                freeRooms.add(currentRoom);
+                freeRooms.add(room);
             }
         }
+
         return freeRooms;
     }
 }
