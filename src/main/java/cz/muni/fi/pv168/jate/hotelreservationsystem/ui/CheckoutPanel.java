@@ -1,16 +1,14 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Reservation;
-import cz.muni.fi.pv168.jate.hotelreservationsystem.model.RoomType;
 import cz.muni.fi.pv168.jate.hotelreservationsystem.model.ReservationState;
-
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.math.BigDecimal.*;
+
 
 
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -61,7 +59,19 @@ final class CheckoutPanel {
         gbc.anchor = GridBagConstraints.FIRST_LINE_START;
         addLabel("Room number:");
         gbc.gridx = 1;
+    }
 
+    public void getCheckedInReservations() {
+        checkOutButton.setEnabled(false);
+        List<Long> data = new ArrayList<>();
+
+        for (Reservation reservation : owner.getReservationDao().findByState(ReservationState.CHECKED_IN)) {
+            data.add(reservation.getRoom().getId());
+        }
+        if (!(data.isEmpty()) ){
+            data.sort(Comparator.naturalOrder());
+        }
+        createListOfRooms(data);
     }
 
     private void createListOfRooms(List<Long> data) {
@@ -84,8 +94,9 @@ final class CheckoutPanel {
     private void loadData(JList list) {
         list.addListSelectionListener(
                 e -> {
-                    checkOutReservation = loadRoomNumberInformation(list.getSelectedValue());
+                    checkOutReservation = loadReservationInformation(list.getSelectedValue());
 
+                    checkOutButton.setEnabled(true);
                     long nights = DAYS.between(checkOutReservation.getCheckinDate(), checkOutReservation.getCheckoutDate());
                     long totalPrice = nights * (checkOutReservation.getRoomV2().getRoomTypeV2().getPricePerNight()).longValue();
 
@@ -99,24 +110,9 @@ final class CheckoutPanel {
         );
     }
 
-    public void getCheckedInReservations() {
-        List<Long> data = new ArrayList<>();
-
-        for (Reservation reservation : owner.getReservationDao().findByState(ReservationState.CHECKED_IN)) {
-            data.add(reservation.getRoom().getId());
-        }
-        if (data.isEmpty()) {
-            checkOutButton.setEnabled(false);
-        } else {
-            checkOutButton.setEnabled(true);
-            data.sort(Comparator.naturalOrder());
-        }
-        createListOfRooms(data);
-    }
-
-    private Reservation loadRoomNumberInformation(Object selectedRoomNumber) {
+    private Reservation loadReservationInformation(Object selectedReservation) {
         for (Reservation reservation : owner.getReservationDao().findAll()) {
-            if (reservation.getRoom().getId().equals((selectedRoomNumber))) {
+            if (reservation.getRoom().getId().equals((selectedReservation))) {
                 return reservation;
             }
         }
