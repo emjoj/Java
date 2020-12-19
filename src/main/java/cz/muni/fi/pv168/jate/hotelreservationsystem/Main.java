@@ -29,7 +29,7 @@ public class Main {
 
     private static DataSource initDataSource() {
         var dataSource = new EmbeddedDataSource();
-        String dbPath = System.getProperty("user.home") + "/hotel-reservation-system";
+        String dbPath = System.getProperty("user.LENOVO") + "/hotel-new";
         dataSource.setDatabaseName(dbPath);
         dataSource.setCreateDatabase("create");
 
