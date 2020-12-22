@@ -1,32 +1,46 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.ui;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeListener;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionListener;
-import java.util.Objects;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.Reservation;
+import cz.muni.fi.pv168.jate.hotelreservationsystem.model.ReservationState;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 final class CheckoutPanel {
 
+    private JTextField firstNameText;
+    private JTextField lastNameText;
+    private JTextField roomText;
+    private JTextField priceText;
+    private JTextField nightsText;
+    private Reservation checkOutReservation;
+
     private final GridBagConstraints gbc = new GridBagConstraints();
     private final JPanel panel = new JPanel();
-    private JComboBox<String> roomTypes;
+    private final JButton checkOutButton = new JButton("Check-out");
     private final JLabel totalCost = new JLabel("0");
-    private int sumPerNight;
-    private JSpinner nights;
+    private final Dashboard owner;
+    private JScrollPane listScroller = null;
 
-    CheckoutPanel() {
+    CheckoutPanel(Dashboard owner) {
+
+        this.owner = owner;
+        createCheckOutForm();
+    }
+
+    private void createCheckOutForm() {
         panel.setLayout(new GridBagLayout());
         panel.setName("Check-out");
-        addRoomNumber();
+        addRoomNumberTitle();
+
+        getCheckedInReservations();
 
         addTitle("Guest Information");
         addGuestInformation();
@@ -34,23 +48,76 @@ final class CheckoutPanel {
         addRoomInformation();
         addTitle("Payment Information");
         addFinalSum();
-        addButton();
+        addCheckoutButton();
     }
 
     public JPanel getPanel() {
         return panel;
     }
 
-    private void addRoomNumber() {
+    private void addRoomNumberTitle() {
         gbc.anchor = GridBagConstraints.FIRST_LINE_START;
         addLabel("Room number:");
-
         gbc.gridx = 1;
-        JTextField roomNumber = new JTextField(15);
-        panel.add(roomNumber, gbc);
     }
 
+    public void getCheckedInReservations() {
+        checkOutButton.setEnabled(false);
+        List<Long> data = new ArrayList<>();
 
+        for (Reservation reservation : owner.getReservationDao().findByState(ReservationState.CHECKED_IN)) {
+            data.add(reservation.getRoom().getId());
+        }
+        if (!(data.isEmpty()) ){
+            data.sort(Comparator.naturalOrder());
+        }
+        createListOfRooms(data);
+    }
+
+    private void createListOfRooms(List<Long> data) {
+        JList list = new JList<>(data.toArray());
+        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        list.setLayoutOrientation(JList.VERTICAL_WRAP);
+
+        list.setVisibleRowCount((data.size() / 5) + 1);
+        list.setFixedCellHeight(20);
+        list.setFixedCellWidth(30);
+
+        if (listScroller == null) {
+            listScroller = new JScrollPane();
+            panel.add(listScroller, gbc);
+        }
+        listScroller.setViewportView(list);
+        loadData(list);
+    }
+
+    private void loadData(JList list) {
+        list.addListSelectionListener(
+                e -> {
+                    checkOutReservation = loadReservationInformation(list.getSelectedValue());
+
+                    checkOutButton.setEnabled(true);
+                    long nights = DAYS.between(checkOutReservation.getCheckinDate(), checkOutReservation.getCheckoutDate());
+                    long totalPrice = nights * (checkOutReservation.getRoomV2().getRoomTypeV2().getPricePerNight()).longValue();
+
+                    firstNameText.setText(checkOutReservation.getOwner().getFirstName());
+                    lastNameText.setText(checkOutReservation.getOwner().getLastName());
+                    roomText.setText(checkOutReservation.getRoomV2().getRoomTypeV2().getBedType().toString());
+                    priceText.setText(checkOutReservation.getRoomV2().getRoomTypeV2().getPricePerNight().toString() + " $");
+                    nightsText.setText(String.valueOf(nights));
+                    totalCost.setText(totalPrice + " $");
+                }
+        );
+    }
+
+    private Reservation loadReservationInformation(Object selectedReservation) {
+        for (Reservation reservation : owner.getReservationDao().findAll()) {
+            if (reservation.getRoom().getId().equals((selectedReservation))) {
+                return reservation;
+            }
+        }
+        return null;
+    }
 
     private void addTitle(String title) {
         gbc.gridx--;
@@ -65,6 +132,13 @@ final class CheckoutPanel {
         gbc.anchor = GridBagConstraints.FIRST_LINE_START;
     }
 
+    private void setTextFieldFormat(JTextField textField) {
+        textField.setEnabled(false);
+        textField.setHorizontalAlignment(JTextField.CENTER);
+        textField.setDisabledTextColor(Color.BLACK);
+        panel.add(textField, gbc);
+    }
+
     private void addGuestInformation() {
         addLabel("First Name:");
         addLabel("Last Name:");
@@ -73,14 +147,12 @@ final class CheckoutPanel {
         gbc.gridy = 2;
         gbc.ipady = 1;
 
-        JTextField firstNameText = new JTextField(15);
-        firstNameText.setEnabled(false);
-        panel.add(firstNameText, gbc);
+        firstNameText = new JTextField(15);
+        setTextFieldFormat(firstNameText);
 
         gbc.gridy++;
-        JTextField lastNameText = new JTextField(15);
-        lastNameText.setEnabled(false);
-        panel.add(lastNameText, gbc);
+        lastNameText = new JTextField(15);
+        setTextFieldFormat(lastNameText);
     }
 
     private void addRoomInformation() {
@@ -92,12 +164,14 @@ final class CheckoutPanel {
         gbc.gridy = 5;
         gbc.ipady = 1;
 
-        addRoomType();
+        roomText = new JTextField(15);
+        setTextFieldFormat(roomText);
         gbc.gridy++;
-        JTextField priceText = new JTextField(15);
-        priceText.setEnabled(false);
-        panel.add(priceText, gbc);
-        addNights();
+        priceText = new JTextField(15);
+        setTextFieldFormat(priceText);
+        gbc.gridy++;
+        nightsText = new JTextField(15);
+        setTextFieldFormat(nightsText);
     }
 
     private void addFinalSum() {
@@ -109,30 +183,37 @@ final class CheckoutPanel {
         panel.add(totalCost, gbc);
     }
 
-    private void addButton() {
+    private void addCheckoutButton() {
         gbc.gridx--;
         gbc.gridy++;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
-        JButton checkOut = new JButton("Check-out");
-        checkOut.addActionListener(e -> {
-            // TODO
+
+        checkOutButton.addActionListener(e -> {
+            for (Reservation reservation : owner.getReservationDao().findByState(ReservationState.CHECKED_IN)) {
+
+                if (reservation.getRoom().getId().equals((checkOutReservation.getRoom().getId()))) {
+                    reservation.setState(ReservationState.CHECKED_OUT);
+                    owner.getReservationDao().update(reservation);
+                }
+            }
+            resetAllCells();
+            getCheckedInReservations();
+            panel.revalidate();
+            panel.repaint();
         });
-        panel.add(checkOut, gbc);
+
+        panel.add(checkOutButton, gbc);
     }
 
-    private void addRoomType() {
-        String[] roomTypeStrings = {"1-bed room", "2-bed room", "3-bed room"};
-        roomTypes = new JComboBox<>(roomTypeStrings);
-        roomTypes.addActionListener(handleRoomTypeChange());
-        panel.add(roomTypes, gbc);
-    }
-
-    private void addNights() {
-        gbc.gridy++;
-        nights = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
-        nights.addChangeListener(handleNightCountChange());
-        panel.add(nights, gbc);
+    private void resetAllCells() {
+        firstNameText.setText("");
+        lastNameText.setText("");
+        roomText.setText("");
+        priceText.setText("");
+        nightsText.setText("");
+        checkOutReservation = null;
+        totalCost.setText("0");
     }
 
     private void addLabel(String s) {
@@ -140,28 +221,4 @@ final class CheckoutPanel {
         gbc.gridy++;
     }
 
-    public ActionListener handleRoomTypeChange() {
-        return e -> {
-            String type = (String) roomTypes.getSelectedItem();
-            switch (Objects.requireNonNull(type)) {
-                case "1-bed room":
-                    sumPerNight = 50;
-                    break;
-                case "2-bed room":
-                    sumPerNight = 100;
-                    break;
-                case "3-bed room":
-                    sumPerNight = 150;
-                    break;
-            }
-            totalCost.setText(Integer.toString((Integer) nights.getValue() * sumPerNight));
-        };
-    }
-
-    public ChangeListener handleNightCountChange() {
-        return e -> {
-            int cost = (Integer) nights.getValue() * sumPerNight;
-            totalCost.setText(Integer.toString(cost));
-        };
-    }
 }

@@ -1,26 +1,47 @@
 package cz.muni.fi.pv168.jate.hotelreservationsystem.model;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
-public class Reservation {
-    private long id;
+public final class Reservation {
+
+    private Long id;
     private Person owner;
     private Room room;
     private LocalDate checkinDate;
     private LocalDate checkoutDate;
+    private ReservationState state;
+    private RoomV2 roomV2 = null;
 
     public Reservation(Person owner, Room room, LocalDate checkinDate, LocalDate checkoutDate) {
         this.owner = owner;
         this.room = room;
         this.checkinDate = checkinDate;
         this.checkoutDate = checkoutDate;
+        this.state = ReservationState.CREATED;
     }
 
-    public long getId() {
+    public Reservation(Person owner, Room room, LocalDate checkinDate, LocalDate checkoutDate, ReservationState state) {
+        this.owner = owner;
+        this.room = room;
+        this.checkinDate = checkinDate;
+        this.checkoutDate = checkoutDate;
+        this.state = state;
+    }
+
+    public RoomV2 getRoomV2() {
+        return roomV2;
+    }
+
+    public void setRoomV2(RoomV2 roomV2) {
+        this.roomV2 = roomV2;
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -54,5 +75,44 @@ public class Reservation {
 
     public void setCheckoutDate(LocalDate checkoutDate) {
         this.checkoutDate = checkoutDate;
+    }
+
+    public ReservationState getState() {
+        return state;
+    }
+
+    public void setState(ReservationState state) {
+        this.state = state;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Reservation that = (Reservation) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(owner, that.owner) &&
+                Objects.equals(room, that.room) &&
+                Objects.equals(checkinDate, that.checkinDate) &&
+                Objects.equals(checkoutDate, that.checkoutDate) &&
+                state == that.state &&
+                Objects.equals(roomV2, that.roomV2);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, owner, room, checkinDate, checkoutDate, state, roomV2);
+    }
+
+    @Override
+    public String toString() {
+        return "Reservation{" +
+                " owner=" + owner +
+                ", room=" + room +
+                ", checkinDate=" + checkinDate +
+                ", checkoutDate=" + checkoutDate +
+                ", id=" + id +
+                ", roomId=" + roomV2 +
+                '}';
     }
 }

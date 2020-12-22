@@ -3,22 +3,36 @@ package cz.muni.fi.pv168.jate.hotelreservationsystem.model;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class Person {
+public final class Person {
 
     private Long id;
     private String firstName;
     private String lastName;
     private LocalDate birthDate;
-    private String evidenceID;
+    private String evidence;
     private String phoneNumber;
     private String email;
 
-    public Person(String firstName, String lastName, LocalDate birthDate, String evidenceID, String email) {
+    public Person(Long id, String firstName, String lastName, LocalDate birthDate, String evidence, String phoneNumber, String email) {
+        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthDate = birthDate;
-        this.evidenceID = evidenceID;
+        this.evidence = evidence;
+        this.phoneNumber = phoneNumber;
         this.email = email;
+    }
+
+    public Person(String firstName, String lastName, LocalDate birthDate, String evidence) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.birthDate = birthDate;
+        this.evidence = evidence;
+    }
+
+    public Person(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
     public Long getId() {
@@ -53,12 +67,12 @@ public class Person {
         this.birthDate = Objects.requireNonNull(birthDate, "Birth date must not be null");
     }
 
-    public String getEvidenceID() {
-        return evidenceID;
+    public String getEvidence() {
+        return evidence;
     }
 
-    public void setEvidenceID(String evidenceID) {
-        this.evidenceID = Objects.requireNonNull(evidenceID, "Evidence ID must not be null");
+    public void setEvidence(String evidence) {
+        this.evidence = Objects.requireNonNull(evidence, "Evidence ID must not be null");
     }
 
     public String getPhoneNumber() {
@@ -66,7 +80,7 @@ public class Person {
     }
 
     public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = Objects.requireNonNull(phoneNumber, "Phone number must not be null");
+        this.phoneNumber = phoneNumber;
     }
 
     public String getEmail() {
@@ -78,14 +92,33 @@ public class Person {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+        return Objects.equals(id, person.id) &&
+                firstName.equals(person.firstName) &&
+                lastName.equals(person.lastName) &&
+                birthDate.equals(person.birthDate) &&
+                evidence.equals(person.evidence) &&
+                Objects.equals(phoneNumber, person.phoneNumber) &&
+                Objects.equals(email, person.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, firstName, lastName, birthDate, evidence, phoneNumber, email);
+    }
+
+    @Override
     public String toString() {
         return "Person{" +
                 " firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", birthDate=" + birthDate +
-                ", evidenceID='" + evidenceID + '\'' +
-                ", email='" + email + '\'' +
+                ", evidenceID='" + evidence + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
+                ", email='" + email + '\'' +
                 ", id=" + id +
                 '}';
     }
